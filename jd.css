@@ -1,0 +1,148 @@
+/***** jd.css - (c) rohan drape, 2001-2008 *****/
+
+html {
+} 
+
+body {
+ color: #000;
+ background-color: #fff;
+ font-family: sans-serif;
+ font-size: 68%;
+ margin: 0px;
+ padding: 0px;
+}
+
+p {
+ padding: 0px;
+}
+
+h1 {
+}
+
+h2 {
+}
+
+a, a:visited {
+ color: #000;
+ text-decoration: none;
+}
+
+a:hover, a:active {
+ color: #000;
+}
+
+img {
+ border: 0px;
+ padding: 0px;
+ margin: 0px;
+}
+
+/***** box model *****/
+
+div.box {
+ margin: 0px;
+ padding: 0px;
+}
+
+div.text {
+ margin: 50px;
+ padding: 50px;
+ background-color: #fff;
+}
+
+div.header {
+ height: 25px;
+ margin-left: 10px;
+ margin-top: 10px;
+ background-color: #fff;
+}
+
+div.left {
+ float: left;
+ width: 15%;
+ text-align: right;
+ background-color: #fff;
+}
+
+div.right {
+ float: left;
+ width: 80%;
+ background-color: #fff;
+ text-align: left;
+}
+
+div.footer {
+ clear: both;
+ height: 20px;
+}
+
+/***** front *****/
+
+body.front {
+ font-family: Didot, sans-serif;
+ font-size: 200%;
+ text-align: center;
+ color: #000;
+}
+
+body.front p {
+ margin: 320px 0px 0px 20px;
+}
+
+/* classed elements */
+
+img.photo {
+ float: none;
+ margin-left: 15px;
+}
+
+p.contact {
+ padding: 160px 0px 80px 50px;
+}
+
+p.copyright {
+ display: none;
+}
+
+p.name {
+ font-size: 180%;
+ padding-top: 0px;
+ margin-top: 0px;
+ padding-bottom: 30px;
+}
+
+p.menu {
+ padding-top: 60px;
+ margin-top: 0px;
+}
+
+p.menu a, p.menu a:visited {
+  color: #999;
+}
+
+p.genera {
+ padding-top: 50px;
+ margin-top: 0px;
+}
+
+p.genera a, p.genera a:visited {
+ color: #999;
+}
+
+p.stepper {
+ padding-top: 60px;
+ margin-top: 0px;
+}
+
+p.stepper a, p.stepper a:visited {
+ color: #ccc;
+}
+
+p.validators {
+ padding-top: 90px;
+ margin-top: 0px;
+}
+
+p.validators a, p.validators a:visited {
+ color: #eee;
+}
