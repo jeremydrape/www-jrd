@@ -49,7 +49,7 @@
 (define (w/class+id c) (attr (class c) (id c)))
 
 (define (build-attr a attr)
-  (if (every (lambda (i) (member i attr)) (map car a))
+  (if (all (lambda (i) (member i attr)) (map car a))
       (map (lambda (key value) (list " " key "=\"" value "\""))
 	   (map car a)
 	   (map cadr a))

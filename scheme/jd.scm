@@ -1,13 +1,7 @@
 ;; jd.scm - (c) rohan drape, 2006-2008
 
-(require (only-in rsc3/rsc3
-		  flatten
-		  floor-exact)
-	 (only-in srfi/1
-		  every
-		  iota)
-	 (only-in (lib "file.ss")
-		  make-directory*))
+(require rhs/plt/rhs)
+(require mzlib/file)
 
 (load "html.scm")
 
@@ -218,7 +212,7 @@
 			      top
 			      title)
 		 (string-append "../portfolio/" title "/" (i n))))
-	      (iota m))))
+	      (enum-from-to 0 (- m 1)))))
 
 (make-series series/portfolio/1 "1" "../../../")
 (make-series series/portfolio/2 "2" "../../../")
