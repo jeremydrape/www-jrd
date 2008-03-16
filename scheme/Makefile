@@ -1,6 +1,10 @@
-all:
+ikarus:
 	make clean
-	mzscheme -f jd.scm
+	ikarus jd.scm
+
+plt:
+	make clean
+	plt-r6rs jd.scm
 
 clean: 
 	rm -fR ../index.html \

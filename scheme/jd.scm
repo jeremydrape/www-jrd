@@ -1,18 +1,26 @@
 ;; jd.scm - (c) rohan drape, 2006-2008
 
+#|
 (require rhs/plt/rhs)
-(require mzlib/file)
+(require mzlib/process)
+(require shtml-minimalist/plt/shtml-minimalist)
+|#
 
-(load "html.scm")
+(import (except (rnrs base) div)
+	(except (rhs r6rs rhs) id head span)
+	(shtml-minimalist r6rs shtml-minimalist))
+
+(define (make-directory s)
+  (system (string-append "mkdir -p " s)))
 
 (define (std-meta a d t s)
-  (let ((t* (++ a ": " d)))
+  (let ((t* (list a ": " d)))
     (list (title* noattr t*)
-	  (meta* name "description" (if (string? t) t t*))
-	  (meta* name "author" a)
-	  (meta* http-equiv "expires" "-1")
-	  (meta* http-equiv "pragma" "no-cache")
-	  (link*  "stylesheet" s "text/css"))))
+	  (make-meta name "description" (if (string? t) t t*))
+	  (make-meta name "author" a)
+	  (make-meta http-equiv "expires" "-1")
+	  (make-meta http-equiv "pragma" "no-cache")
+	  (make-link "stylesheet" s "text/css"))))
 
 (define std-html-attr 
   (attr (xmlns "http://www.w3.org/1999/xhtml")
@@ -94,30 +102,30 @@
 (define (portfolio curr prev next txt top series)
   (let ((header (p (w/class "name") (a (attr (href top)) "JEREMY DRAPE")))
 	(footer (list))
-	(right (a (attr (title "forward") (href (++ "../" next)))
+	(right (a (attr (title "forward") (href (list "../" next)))
 		  (img (attr (class "photo")
-			     (src (++ top "images/portfolio/" series "/" curr ".jpeg"))
-			     (alt (++ curr ", photo by jeremy drape"))))))
+			     (src (list top "images/portfolio/" series "/" curr ".jpeg"))
+			     (alt (list curr ", photo by jeremy drape"))))))
 	(left (div noattr
 		   (p (w/class "menu")
-		      (a (attr (href (++ top "portfolio/1/state-library/")))
+		      (a (attr (href (list top "portfolio/1/state-library/")))
 			 "PORTFOLIO 1")
 		      (br noattr)
-		      (a (attr (href (++ top "portfolio/2/ferry/")))
+		      (a (attr (href (list top "portfolio/2/ferry/")))
 			 "PORTFOLIO 2")
 		      (br noattr)
-		      (a (attr (href (++ top "portfolio/3/annie/")))
+		      (a (attr (href (list top "portfolio/3/annie/")))
 			 "PORTFOLIO 3"))
 		   (p (w/class "genera")
-		      (a (attr (href (++ top "about/")))
+		      (a (attr (href (list top "about/")))
 			 "CV") 
 		      (br noattr)
-		      (a (attr (href (++ top "contact/")))
+		      (a (attr (href (list top "contact/")))
 			 "CONTACT"))
 		   (p (w/class "stepper")
-		      (a (attr (title "back") (href (++ "../" prev))) "&larr;")
+		      (a (attr (title "back") (href (list "../" prev))) "&larr;")
 		      "&nbsp;"
-		      (a (attr (title "forward") (href (++ "../" next))) "&rarr;"))
+		      (a (attr (title "forward") (href (list "../" next))) "&rarr;"))
 		   (p (w/class "validators")
 		      (a (attr (href xhtml-validator)) "XHTML, ")
 		      (a (attr (href css-validator)) "CSS.")))))
@@ -135,15 +143,13 @@
 	   (div (w/class "footer") std-copyright))))))
 
 (define (write-file tree dir)
-  (if (not (directory-exists? dir))
-      (make-directory* dir)
-      #f)
+  (make-directory dir)
   (with-output-to-file (string-append dir "/index.html")
     (lambda ()
       (for-each
        display
        (flatten
-	(++ (?xml "1.0" "UTF-8")
+	(list (?xml "1.0" "UTF-8")
 	    (!doctype "html" 
 		      "PUBLIC" 
 		      "-//W3C//DTD XHTML 1.0 Strict//EN" 
