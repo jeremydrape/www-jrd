@@ -1,6 +1,6 @@
 (import (except (rnrs base) div)
-        (except (rhs r6rs rhs) id head span)
-        (shtml-minimalist r6rs shtml-minimalist))
+        (except (rhs) id head span)
+        (shtml-minimalist))
 
 (define make-directory
   (lambda (s)
@@ -46,7 +46,7 @@
    (body
     (attr (class "front"))
     (p noattr
-       (a (attr (href "portfolio/1/state-library"))
+       (a (attr (href "portfolio/1/stairs/"))
           "W W W . J E R E M Y D R A P E . C O M")))))
 
 (define mk-left-menu
@@ -54,14 +54,14 @@
     (div
      noattr
      (p (w/class "menu")
-        (a (attr (href (list top "portfolio/1/state-library/")))
-           "PORTFOLIO 1")
-        (br noattr)
-        (a (attr (href (list top "portfolio/2/ferry/")))
-           "PORTFOLIO 2")
-        (br noattr)
-        (a (attr (href (list top "portfolio/3/annie/")))
-           "PORTFOLIO 3"))
+        (a (attr (href (list top "portfolio/1/stairs/")))
+           "PORTFOLIO")
+        (br noattr))
+;;        (a (attr (href (list top "portfolio/2/ferry/")))
+;;           "PORTFOLIO 2"))
+;;        (br noattr)
+;;        (a (attr (href (list top "portfolio/3/annie/")))
+;;           "PORTFOLIO 3"))
      (p (w/class "genera")
         (a (attr (href (list top "about/")))
            "CV")
@@ -154,7 +154,7 @@
      "2002 - SIGNAGE - FOUND PROJECT SPACE<br/>"))))
 
 (define portfolio
-  (lambda (curr prev next txt top series)
+  (lambda (curr prev next txt top series next-series)
     (let ((header
            (p
             (w/class "name")
@@ -165,7 +165,7 @@
            (a
             (attr
              (title "forward")
-             (href (list "../" next)))
+             (href (list "../../" next-series "/" next)))
             (img
              (attr (class "photo")
                    (src (list top "images/portfolio/" series "/" curr ".jpeg"))
@@ -225,12 +225,16 @@
 
 (define series/portfolio/1
   (list
-   (list "state-library" "")
-   (list "anthony" "")
-   (list "hiding" "")
-   (list "pool" "")
-   (list "stairs" "")
-   (list "karly" "")
+   (list "stairs" "" "1")
+   (list "karly" "" "1")
+   (list "ferry" "ferry (greece), 2005" "2")
+   (list "hiding" "" "1")
+   (list "anthony" "" "1")
+   (list "tower" "tower, 2005" "2")
+   (list "pool" "" "1")
+   (list "ladder" "ladder, 2005" "2")
+   (list "island" "" "2")
+   (list "state-library" "" "1")
    ))
 
 (define series/portfolio/2
@@ -263,7 +267,7 @@
    (list "julian" "julian, 2006")
    ))
 
-(define (make-series series title top)
+(define (make-series series top)
   (let* ((m (length series))
          (z (lambda (j)
               (lambda (i)
@@ -271,7 +275,8 @@
                  (list-ref series (modulo i m))
                  j))))
          (i (z 0))
-         (t (z 1)))
+         (t (z 1))
+         (s (z 2)))
     (for-each (lambda (n)
                 (write-file
                  (portfolio (i n)
@@ -279,12 +284,13 @@
                             (i (+ n 1))
                             (t n)
                             top
-                            title)
-                 (string-append "../portfolio/" title "/" (i n))))
+                            (s n)
+                            (s (+ n 1)))
+                 (string-append "../portfolio/" (s n) "/" (i n))))
               (enum-from-to 0 (- m 1)))))
 
-(make-series series/portfolio/1 "1" "../../../")
-(make-series series/portfolio/2 "2" "../../../")
-(make-series series/portfolio/3 "3" "../../../")
+(make-series series/portfolio/1 "../../../")
+;;(make-series series/portfolio/2 "2" "../../../")
+;;(make-series series/portfolio/3 "3" "../../../")
 
 (exit)
