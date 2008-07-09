@@ -15,6 +15,8 @@ a {
  color: #666;
 }
 
+/* f/n */
+
 div.menu {
  color: #666;
  text-align: left;
@@ -32,4 +34,19 @@ div.photo {
 
 div.index {
  text-align: center;
+}
+
+/* f/a */
+
+div.node {
+ clear: both;
+ padding-left: 5px;
+ margin-left: 5px;
+}
+
+div.image {
+ float: left;
+}
+
+div.text {
 }
