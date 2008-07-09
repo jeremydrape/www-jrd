@@ -97,11 +97,11 @@ std_meta d s =
     ,H.meta [H.name "description", H.content d]
     ,H.link [H.rel "stylesheet", H.type' "text/css", H.href s] ]
 
-mk_page :: [H.Element] -> String
-mk_page e = 
+mk_page :: String -> [H.Element] -> String
+mk_page t e = 
     H.renderXHTML 
      H.xhtml_1_0_strict 
-      (H.html [] [H.head [] (std_meta "tst" "../../jrd-f.css"), H.body [] e])
+      (H.html [] [H.head [] (std_meta t "../../jrd-f.css"), H.body [] e])
 
 mk_index :: [(Image, Integer)] -> Image -> H.Element
 mk_index is c = 
@@ -117,8 +117,9 @@ write_page is i =
            d = ".." </> "f" </> identifier i
            m = dv "menu" [dv "jrd" [H.CData "JEREMY DRAPE"]
                          ,dv "lks" [H.CData "CONTACT | CV"]]
+           t = "jrd/f/" ++ identifier i
        createDirectoryIfMissing True d
-       writeFile (d </> "index.html") (mk_page [m, mk_div i, idx])
+       writeFile (d </> "index.html") (mk_page t [m, mk_div i, idx])
 
 main :: IO ()
 main = do
