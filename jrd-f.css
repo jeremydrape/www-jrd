@@ -36,6 +36,10 @@ div.index {
  text-align: center;
 }
 
+div.index a {
+ text-decoration: none;
+}
+
 /* f/a */
 
 div.node {

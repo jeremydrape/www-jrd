@@ -11,7 +11,7 @@ data Image = Image { identifier :: String
                    , server :: String
                    , farm :: String
                    , title :: String }
-             deriving (Show)
+             deriving (Show, Eq)
 
 mk_image :: Element -> Image
 mk_image e = 
@@ -103,12 +103,30 @@ mk_page e =
      H.xhtml_1_0_strict 
       (H.html [] [H.head [] (std_meta "tst" "../../jrd-f.css"), H.body [] e])
 
-mk_index :: [(Image, Integer)] -> H.Element
-mk_index is = 
-    let f (i,n) = H.a 
+mk_index :: [(Image, Integer)] -> Image -> H.Element
+mk_index is c = 
+    let f (i,n) = if i == c then H.CData (show n) else (g (i,n))
+        g (i,n) = H.a 
                   [H.href (".." </> ".." </> "f" </> identifier i)] 
                   [H.CData (show n)]
     in dv "index" (intersperse (H.CData " ") (map f is))
+
+write_page :: [(Image, Integer)] -> Image -> IO ()
+write_page is i = 
+    do let idx = mk_index is i
+           d = ".." </> "f" </> identifier i
+           m = dv "menu" [dv "jrd" [H.CData "JEREMY DRAPE"]
+                         ,dv "lks" [H.CData "CONTACT | CV"]]
+       createDirectoryIfMissing True d
+       writeFile (d </> "index.html") (mk_page [m, mk_div i, idx])
+
+main :: IO ()
+main = do
+  xs <- mapM (get_info "fc835bdbc725d54415ff763ee93f7c2d") jrd
+  let is = catMaybes xs
+      js = zip is [1..]
+  mapM_ (putStrLn . show) is
+  mapM_ (write_page js) is
 
 jrd :: [String]
 jrd = ["2649268247"
@@ -124,18 +142,3 @@ jrd = ["2649268247"
       ,"2649053773"
       ,"2649884956"]
 
-write_page :: H.Element -> Image -> IO ()
-write_page idx i = 
-    do let d = ".." </> "f" </> identifier i
-           m = dv "menu" [dv "jrd" [H.CData "JEREMY DRAPE"]
-                         ,dv "lks" [H.CData "CONTACT | CV"]]
-       createDirectoryIfMissing True d
-       writeFile (d </> "index.html") (mk_page [m, mk_div i, idx])
-
-main :: IO ()
-main = do
-  xs <- mapM (get_info "fc835bdbc725d54415ff763ee93f7c2d") jrd
-  let is = catMaybes xs
-      idx = mk_index (zip is [1..])
-  mapM_ (putStrLn . show) is
-  mapM_ (write_page idx) is
