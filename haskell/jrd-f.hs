@@ -83,7 +83,8 @@ dv :: String -> [H.Element] -> H.Element
 dv c = H.div [H.class' c]
 
 mk_div :: Image -> H.Element
-mk_div p = dv "photo" [H.img [H.src (mk_uri Nothing p)]]
+mk_div p = dv "photo" [H.img [H.src (mk_uri Nothing p)
+                             ,H.height "500px"]]
 
 std_html_attr :: [H.Attribute]
 std_html_attr = 
@@ -108,27 +109,76 @@ mk_index is c =
     let f (i,n) = if i == c then H.CData (show n) else (g (i,n))
         g (i,n) = H.a 
                   [H.href (".." </> ".." </> "f" </> identifier i)] 
-                  [H.CData (show n)]
+                  [H.CData (show n)
+                  ,H.nbsp]
     in dv "index" (intersperse (H.CData " ") (map f is))
+
+menu :: H.Element
+menu = dv 
+       "menu"
+       [dv "jrd" [H.CData "jeremy drape / photography"]
+       ,dv "lks" (intersperse 
+                  (H.CData ", ")
+                  [H.a 
+                   [H.href ("../" ++ show (head jrd))] 
+                   [H.CData "portfolio"]
+                  ,H.a 
+                   [H.href "../projects"] 
+                   [H.CData "projects"]
+                  ,H.a 
+                   [H.href "http://horsehunting.blogspot.com/"] 
+                   [H.CData "blog"]
+                  ,H.a 
+                   [H.href "../bio"] 
+                   [H.CData "bio"]
+                  ,H.a 
+                   [H.href "../contact"] 
+                   [H.CData "contact"]])]
 
 write_page :: [(Image, Integer)] -> Image -> IO ()
 write_page is i = 
     do let idx = mk_index is i
            d = ".." </> "f" </> identifier i
-           m = dv "menu" [dv "jrd" [H.CData "JEREMY DRAPE"]
-                         ,dv "lks" [H.CData "CONTACT | CV"]]
            t = "jrd/f/" ++ identifier i
        createDirectoryIfMissing True d
-       writeFile (d </> "index.html") (mk_page t [m, mk_div i, idx])
+       writeFile (d </> "index.html") (mk_page t [menu, mk_div i, idx])
+
+mk_textual :: String -> [String] -> IO ()
+mk_textual t ls = do
+  let d = "../f/" ++ t
+  createDirectoryIfMissing True d
+  writeFile (d </> "index.html") (mk_page t [menu, H.div [H.class' "text"] (intersperse (H.br []) (map H.CData ls))])
+
 
 main :: IO ()
 main = do
-  xs <- mapM (get_info "fc835bdbc725d54415ff763ee93f7c2d") jrd
+  mk_textual "contact" contact
+  mk_textual "bio" bio
+  mk_textual "projects" ["coming soon..."]
+{-
+  xs <- mapM (get_info "fc835bdbc725d54415ff763ee93f7c2d") (map show jrd)
   let is = catMaybes xs
       js = zip is [1..]
   mapM_ (putStrLn . show) is
   mapM_ (write_page js) is
+-}
 
+jrd :: [Integer]
+jrd = [2773687772
+      ,2752508645
+      ,2772814665
+      ,2752510459
+      ,2752613797
+      ,2752505961
+      ,2773734560
+      ,2753341584
+      ,2773617644
+      ,2772917061
+      ,2773744908
+      ,2772897849
+      ,2773739848]
+
+{-
 jrd :: [String]
 jrd = ["2649268247"
       ,"2650059364"
@@ -142,4 +192,43 @@ jrd = ["2649268247"
       ,"2649885782"
       ,"2649053773"
       ,"2649884956"]
+-}
 
+contact :: [String]
+contact = [""
+          ,""
+          ,""
+          ,""
+          ,"jeremy drape"
+          ,"email:jeremy@jeremydrape.com"
+          ,"http://www.jeremydrape.com/"
+          ,"telephone:0406 627 085"]
+
+bio :: [String]
+bio = ["Education"
+      ,"_________"
+      ,""
+      ,"Bachelor of Fine Art (Honours)"
+      ,"Major - Photography"
+      ,"2000 - 2004"
+      ,"Victorian College of The Arts"
+      ,""
+      ,"Awards"
+      ,"______"
+      ,""
+      ,"2003 - Dr David Rosenthal Award, VCA"
+      ,"2001 - Theodor Urbach Award, VCA"
+      ,""
+      ,"Selected Group Exhibitions"
+      ,"__________________________"
+      ,""
+      ,"2007 - Polar - Margaret Lawrence Gallery"
+      ,"2007 - Always On My Mind - TCB Gallery"
+      ,"2004 - The Graduate Show - Margaret Lawrence Gallery"
+      ,"2004 - VCA Photography Graduates - Span Galleries"
+      ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
+      ,"2003 - Art of Protest - Bmw Edge Federation Square"
+      --,"2003 - Enter Via The Train Line - Hope Street Gallery"
+      --,"2003 - Edition 10 - Homeless Gallery"
+      --,"2002 - Signage - Found Project Space"
+      ]
