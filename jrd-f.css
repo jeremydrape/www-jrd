@@ -10,6 +10,12 @@ img {
  padding: 0px;
 }
 
+h2 {
+ font-size: 100%;
+ font-weight: normal;
+ text-decoration: underline;
+}
+
 a {
  text-decoration: none;
  color: #666;

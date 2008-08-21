@@ -84,7 +84,8 @@ dv c = H.div [H.class' c]
 
 mk_div :: Image -> H.Element
 mk_div p = dv "photo" [H.img [H.src (mk_uri Nothing p)
-                             ,H.height "500px"]]
+                             ,H.height "500px"
+                             ,H.alt (title p)]]
 
 std_html_attr :: [H.Attribute]
 std_html_attr = 
@@ -98,70 +99,93 @@ std_meta d s =
     ,H.meta [H.name "description", H.content d]
     ,H.link [H.rel "stylesheet", H.type' "text/css", H.href s] ]
 
-mk_page :: String -> [H.Element] -> String
-mk_page t e = 
+mk_page :: FilePath -> String -> [H.Element] -> String
+mk_page top t e = 
     H.renderXHTML 
      H.xhtml_1_0_strict 
-      (H.html [] [H.head [] (std_meta t "../../jrd-f.css"), H.body [] e])
+      (H.html 
+       [H.xmlns "http://www.w3.org/1999/xhtml"
+       ,H.xml_lang "en"
+       ,H.lang "en"] 
+       [H.head [] (std_meta t (top </> "jrd-f.css")), H.body [] e])
 
-mk_index :: [(Image, Integer)] -> Image -> H.Element
-mk_index is c = 
+mk_index :: FilePath -> [(Image, Integer)] -> Image -> H.Element
+mk_index top is c = 
     let f (i,n) = if i == c then H.CData (show n) else (g (i,n))
         g (i,n) = H.a 
-                  [H.href (".." </> ".." </> "f" </> identifier i)] 
+                  [H.href (top </> "f" </> identifier i)] 
                   [H.CData (show n)
                   ,H.nbsp]
     in dv "index" (intersperse (H.CData " ") (map f is))
 
-menu :: H.Element
-menu = dv 
+menu :: FilePath -> H.Element
+menu top = dv 
        "menu"
-       [dv "jrd" [H.CData "jeremy drape / photography"]
+       [dv "jrd" [H.a [H.href "http://jeremydrape.com"] [H.CData "jeremy drape"]
+                 ,H.CData " / photography"]
        ,dv "lks" (intersperse 
                   (H.CData ", ")
                   [H.a 
-                   [H.href ("../" ++ show (head jrd))] 
+                   [H.href (top </> "f" </> show (head jrd))] 
                    [H.CData "portfolio"]
                   ,H.a 
-                   [H.href "../projects"] 
+                   [H.href (top </> "f" </> "projects")] 
                    [H.CData "projects"]
                   ,H.a 
                    [H.href "http://horsehunting.blogspot.com/"] 
                    [H.CData "blog"]
                   ,H.a 
-                   [H.href "../bio"] 
+                   [H.href (top </> "f" </> "bio")] 
                    [H.CData "bio"]
                   ,H.a 
-                   [H.href "../contact"] 
+                   [H.href (top </> "f" </> "contact")]
                    [H.CData "contact"]])]
+
+up :: Int -> FilePath
+up 0 = "."
+up 1 = ".."
+up n = ".." </> up (n - 1)
 
 write_page :: [(Image, Integer)] -> Image -> IO ()
 write_page is i = 
-    do let idx = mk_index is i
+    do let idx = mk_index (up 2) is i
            d = ".." </> "f" </> identifier i
            t = "jrd/f/" ++ identifier i
        createDirectoryIfMissing True d
-       writeFile (d </> "index.html") (mk_page t [menu, mk_div i, idx])
+       writeFile (d </> "index.html") (mk_page (up 2) t [ menu (up 2)
+                                                        , mk_div i
+                                                        , idx ])
 
-mk_textual :: String -> [String] -> IO ()
+write_front :: Image -> IO ()
+write_front i = 
+    do let d = ".." </> "f"
+           t = "jeremy drape / photographer" ++ identifier i
+       createDirectoryIfMissing True d
+       writeFile (d </> "index.html") (mk_page ".." t [menu (up 1), mk_div i])
+
+mk_section :: (String,[String]) -> H.Element
+mk_section (t,ls) = H.div [] [H.h2 [] [H.CData t] 
+                             ,H.div [] (intersperse (H.br []) (map H.CData ls))]
+
+mk_textual :: String -> [(String,[String])] -> IO ()
 mk_textual t ls = do
   let d = "../f/" ++ t
   createDirectoryIfMissing True d
-  writeFile (d </> "index.html") (mk_page t [menu, H.div [H.class' "text"] (intersperse (H.br []) (map H.CData ls))])
-
+  let c = map mk_section ls
+      p = mk_page "../.." t [menu (up 2), H.div [H.class' "text"] c]
+  writeFile (d </> "index.html") p
 
 main :: IO ()
 main = do
-  mk_textual "contact" contact
-  mk_textual "bio" bio
-  mk_textual "projects" ["coming soon..."]
-{-
   xs <- mapM (get_info "fc835bdbc725d54415ff763ee93f7c2d") (map show jrd)
   let is = catMaybes xs
       js = zip is [1..]
   mapM_ (putStrLn . show) is
   mapM_ (write_page js) is
--}
+  write_front (is !! 2)
+  mk_textual "contact" contact
+  mk_textual "bio" bio
+  mk_textual "projects" [("",["coming soon..."])]
 
 jrd :: [Integer]
 jrd = [2773687772
@@ -194,41 +218,30 @@ jrd = ["2649268247"
       ,"2649884956"]
 -}
 
-contact :: [String]
-contact = [""
-          ,""
-          ,""
-          ,""
-          ,"jeremy drape"
-          ,"email:jeremy@jeremydrape.com"
-          ,"http://www.jeremydrape.com/"
-          ,"telephone:0406 627 085"]
+contact :: [(String,[String])]
+contact = [(""
+           ,[""
+            ,""
+            ,""
+            ,""
+            ,"jeremy drape"
+            ,"email:jeremy@jeremydrape.com"
+            ,"http://www.jeremydrape.com/"
+            ,"telephone:0406 627 085"])]
 
-bio :: [String]
-bio = ["Education"
-      ,"_________"
-      ,""
-      ,"Bachelor of Fine Art (Honours)"
-      ,"Major - Photography"
-      ,"2000 - 2004"
-      ,"Victorian College of The Arts"
-      ,""
-      ,"Awards"
-      ,"______"
-      ,""
-      ,"2003 - Dr David Rosenthal Award, VCA"
-      ,"2001 - Theodor Urbach Award, VCA"
-      ,""
-      ,"Selected Group Exhibitions"
-      ,"__________________________"
-      ,""
-      ,"2007 - Polar - Margaret Lawrence Gallery"
-      ,"2007 - Always On My Mind - TCB Gallery"
-      ,"2004 - The Graduate Show - Margaret Lawrence Gallery"
-      ,"2004 - VCA Photography Graduates - Span Galleries"
-      ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
-      ,"2003 - Art of Protest - Bmw Edge Federation Square"
-      --,"2003 - Enter Via The Train Line - Hope Street Gallery"
-      --,"2003 - Edition 10 - Homeless Gallery"
-      --,"2002 - Signage - Found Project Space"
-      ]
+bio :: [(String,[String])]
+bio = [("Education"
+       ,["Bachelor of Fine Art (Honours)"
+        ,"Major - Photography"
+        ,"2000 - 2004"
+        ,"Victorian College of The Arts"])
+      ,("Awards"
+       ,["2003 - Dr David Rosenthal Award, VCA"
+        ,"2001 - Theodor Urbach Award, VCA"])
+      ,("Selected Group Exhibitions"
+       ,["2007 - Polar - Margaret Lawrence Gallery"
+        ,"2007 - Always On My Mind - TCB Gallery"
+        ,"2004 - The Graduate Show - Margaret Lawrence Gallery"
+        ,"2004 - VCA Photography Graduates - Span Galleries"
+        ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
+        ,"2003 - Art of Protest - Bmw Edge Federation Square"])]
