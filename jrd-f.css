@@ -16,15 +16,15 @@ h2 {
  text-decoration: underline;
 }
 
-a {
+a, a:link, a:visited, a:active, a:hover {
  text-decoration: none;
- color: #666;
+ color: #333;
 }
 
 /* f/n */
 
 div.menu {
- color: #666;
+ color: #333;
  text-align: center;
  padding-left: 5px;
  margin-left: 5px;
@@ -40,6 +40,7 @@ div.photo {
 
 div.index {
  text-align: center;
+ color: #000;
 }
 
 div.index a {
