@@ -179,7 +179,8 @@ mk_textual :: String -> [(String,[String])] -> IO ()
 mk_textual t ls = do
   let d = "../f/" ++ t
   createDirectoryIfMissing True d
-  let c = map mk_section ls
+  let e = replicate 4 (H.br [])
+      c = e ++ map mk_section ls
       p = mk_page "../.." t [menu (up 2), H.div [H.class' "text"] c]
   writeFile (d </> "index.html") p
 
