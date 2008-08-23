@@ -82,10 +82,12 @@ mk_uri s p = let t = maybe "" (\c -> ['_', c]) s
 dv :: String -> [H.Element] -> H.Element
 dv c = H.div [H.class' c]
 
-mk_div :: Image -> H.Element
-mk_div p = dv "photo" [H.img [H.src (mk_uri Nothing p)
-                             ,H.height "500px"
-                             ,H.alt (title p)]]
+mk_div :: Image -> Maybe String -> H.Element
+mk_div p n = dv "photo" [H.a 
+                         [H.href (maybe "http://jeremydrape.com" (\i -> ".." </> i) n)]
+                         [H.img [H.src (mk_uri Nothing p)
+                                ,H.height "500px"
+                                ,H.alt (title p)]]]
 
 std_html_attr :: [H.Attribute]
 std_html_attr = 
@@ -147,6 +149,11 @@ up 0 = "."
 up 1 = ".."
 up n = ".." </> up (n - 1)
 
+find_next :: [Image] -> Image -> Maybe String
+find_next (i:j:xs) k | i == k = Just (identifier j)
+                     | otherwise = find_next (j:xs) k
+find_next _ _ = Nothing
+
 write_page :: [(Image, Integer)] -> Image -> IO ()
 write_page is i = 
     do let idx = mk_index (up 2) is i
@@ -154,7 +161,7 @@ write_page is i =
            t = "jrd/f/" ++ identifier i
        createDirectoryIfMissing True d
        writeFile (d </> "index.html") (mk_page (up 2) t [ menu (up 2)
-                                                        , mk_div i
+                                                        , mk_div i (find_next (map fst is) i)
                                                         , idx ])
 
 write_front :: Image -> IO ()
@@ -162,7 +169,7 @@ write_front i =
     do let d = ".." </> "f"
            t = "jeremy drape / photographer" ++ identifier i
        createDirectoryIfMissing True d
-       writeFile (d </> "index.html") (mk_page ".." t [menu (up 1), mk_div i])
+       writeFile (d </> "index.html") (mk_page ".." t [menu (up 1), mk_div i Nothing])
 
 mk_section :: (String,[String]) -> H.Element
 mk_section (t,ls) = H.div [] [H.h2 [] [H.CData t] 
