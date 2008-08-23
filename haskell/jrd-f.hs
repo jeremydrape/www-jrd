@@ -132,7 +132,8 @@ menu top = dv
                    [H.href (top </> "f" </> "projects")] 
                    [H.CData "projects"]
                   ,H.a 
-                   [H.href "http://horsehunting.blogspot.com/"] 
+                   [H.href "http://horsehunting.blogspot.com/"
+                   ,H.target "_blank"] 
                    [H.CData "blog"]
                   ,H.a 
                    [H.href (top </> "f" </> "bio")] 
