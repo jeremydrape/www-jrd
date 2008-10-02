@@ -1,3 +1,4 @@
+import Data.List
 import Data.Maybe
 import System.Directory
 import System.FilePath
@@ -72,7 +73,7 @@ mk_div p =
     let l e = [H.a [H.href (mk_uri Nothing p)] e]
         i = l [H.img [H.src (mk_uri (Just 's') p)]]
         t = l [H.CData (title p)]
-    in dv "node" [dv "image" i, dv "text" t]
+    in dv "node-a" [dv "image-a" i, dv "text-a" t]
 
 std_html_attr :: [H.Attribute]
 std_html_attr = 
@@ -92,11 +93,15 @@ mk_page e =
      H.xhtml_1_0_strict 
       (H.html [] [H.head [] (std_meta "tst" "../../jrd-f.css"), H.body [] e])
 
+compareBy :: Ord a => (x -> a) -> x -> x -> Ordering
+compareBy f x y = compare (f x) (f y)
+
 main :: IO ()
 main = do
   is <- get_public_photos "fc835bdbc725d54415ff763ee93f7c2d" "28389435@N07" 1 100
   let d = "../f/a"
+      is' = sortBy (compareBy title) is
   createDirectoryIfMissing True d
-  writeFile (d </> "index.html") (mk_page (map mk_div is))
-  mapM_ putStrLn (map show is)
-  mapM_ putStrLn (map identifier is)
+  writeFile (d </> "index.html") (mk_page (map mk_div is'))
+  mapM_ putStrLn (map show is')
+  mapM_ putStrLn (map identifier is')

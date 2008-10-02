@@ -47,18 +47,28 @@ div.index a {
  text-decoration: none;
 }
 
-/* f/a */
-
-div.node {
- clear: both;
- padding-left: 5px;
- margin-left: 5px;
-}
-
-div.image {
- float: left;
-}
+/* f/txt */
 
 div.text {
  text-align: center;
+}
+
+
+/* f/a */
+
+div.node-a {
+ clear: both;
+ padding: 5px 0px 0px 5px;
+ margin: 5px 0px 0px 5px;
+ border-style: dotted;
+ border-color: #aaa;
+ border-width: 1px 0px 0px 0px;
+}
+
+div.image-a {
+ float: left;
+}
+
+div.text-a {
+ text-align: left;
 }
