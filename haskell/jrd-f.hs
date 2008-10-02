@@ -83,11 +83,11 @@ dv :: String -> [H.Element] -> H.Element
 dv c = H.div [H.class' c]
 
 mk_div :: Image -> Maybe String -> H.Element
-mk_div p n = dv "photo" [H.a 
-                         [H.href (maybe "http://jeremydrape.com" (\i -> ".." </> i) n)]
-                         [H.img [H.src (mk_uri Nothing p)
-                                ,H.height "500px"
-                                ,H.alt (title p)]]]
+mk_div p n = dv "photo" [maybe i f n]
+    where i = H.img [H.src (mk_uri Nothing p)
+                    ,H.height "500px"
+                    ,H.alt (title p)]
+          f m = H.a [H.href (".." </> m)] [i]
 
 std_html_attr :: [H.Attribute]
 std_html_attr = 
