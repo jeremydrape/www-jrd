@@ -112,8 +112,8 @@ mk_page top t e =
        [H.head [] (std_meta t (top </> "jrd-f.css")), H.body [] e])
 
 mk_index :: FilePath -> [(Image, Integer)] -> Image -> H.Element
-mk_index top is c = 
-    let f (i,n) = if i == c then H.CData (show n) else (g (i,n))
+mk_index top is _c = 
+    let f (i,n) = g (i,n) -- if i == c then H.CData (show n) else (g (i,n))
         g (i,n) = H.a 
                   [H.href (top </> "f" </> identifier i)] 
                   [H.CData (show n)
