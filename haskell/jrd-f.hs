@@ -1,21 +1,23 @@
 import Data.List
 import Data.Maybe
+import System.Console.GetOpt
 import System.Directory
+import System.Environment
 import System.FilePath
 import Text.HTML.Download
 import qualified Text.Html.Light as H
-import Text.XML.Light
+import qualified Text.XML.Light as X
 
 data Image = Image { identifier :: String
                    , secret :: String
                    , server :: String
                    , farm :: String
                    , title :: String }
-             deriving (Show, Eq)
+             deriving (Read, Show, Eq)
 
-mk_image :: Element -> Image
+mk_image :: X.Element -> Image
 mk_image e = 
-    let f s = maybe "" id (findAttr (QName s Nothing Nothing) e)
+    let f s = maybe "" id (X.findAttr (X.QName s Nothing Nothing) e)
     in Image (f "id") (f "secret") (f "server") (f "farm") (f "title")
 
 flickr_rest :: String -> [(String,String)] -> String
@@ -57,21 +59,21 @@ run_query u = do
   s <- openURL u
   return (delete_http_headers (lines s))
 
-mk_query :: String -> IO (Maybe Element)
+mk_query :: String -> IO (Maybe X.Element)
 mk_query u = do
   xs <- run_query u
-  return (parseXMLDoc (concat xs))
+  return (X.parseXMLDoc (concat xs))
 
 get_public_photos :: String -> String -> Integer -> Integer -> IO [Image]
 get_public_photos k u p n = do
   e <- mk_query (get_public_photos_uri k u p n)
-  let ps = maybe [] (findElements (QName "photo" Nothing Nothing)) e
+  let ps = maybe [] (X.findElements (X.QName "photo" Nothing Nothing)) e
   return (map mk_image ps)
  
 get_info :: String -> String -> IO (Maybe Image)
 get_info k n = do
   e <- mk_query (get_info_uri k n)
-  let p = maybe Nothing (findElement (QName "photo" Nothing Nothing)) e
+  let p = maybe Nothing (X.findElement (X.QName "photo" Nothing Nothing)) e
   return (maybe Nothing (Just . mk_image) p)
 
 mk_uri :: Maybe Char -> Image -> String
@@ -87,7 +89,7 @@ mk_div p n = dv "photo" [maybe i f n]
     where i = H.img [H.src (mk_uri Nothing p)
                     ,H.height "500px"
                     ,H.alt (title p)]
-          f m = H.a [H.href (".." </> m)] [i]
+          f m = H.a [H.href (up 1 </> m)] [i]
 
 std_html_attr :: [H.Attribute]
 std_html_attr = 
@@ -111,14 +113,15 @@ mk_page top t e =
        ,H.lang "en"] 
        [H.head [] (std_meta t (top </> "jrd-f.css")), H.body [] e])
 
-mk_index :: FilePath -> [(Image, Integer)] -> Image -> H.Element
-mk_index top is _c = 
+mk_index :: String -> FilePath -> [(Image, Integer)] -> Image -> H.Element
+mk_index s top is _c = 
     let f (i,n) = g (i,n) -- if i == c then H.CData (show n) else (g (i,n))
         g (i,n) = H.a 
                   [H.href (top </> "f" </> identifier i)] 
                   [H.CData (show n)
                   ,H.nbsp]
-    in dv "index" (intersperse (H.CData " ") (map f is))
+        h = H.span [H.class' "area"] [H.CData (s ++ ": ")]
+    in dv "index" (h : intersperse (H.CData " ") (map f is))
 
 menu :: FilePath -> H.Element
 menu top = dv 
@@ -128,7 +131,7 @@ menu top = dv
        ,dv "lks" (intersperse 
                   (H.CData ", ")
                   [H.a 
-                   [H.href (top </> "f" </> show (head jrd))] 
+                   [H.href (top </> "f" </> show (head jrd_portfolio))] 
                    [H.CData "portfolio"]
                   ,H.a 
                    [H.href (top </> "f" </> "projects")] 
@@ -154,10 +157,10 @@ find_next (i:j:xs) k | i == k = Just (identifier j)
                      | otherwise = find_next (j:xs) k
 find_next _ _ = Nothing
 
-write_page :: [(Image, Integer)] -> Image -> IO ()
-write_page is i = 
-    do let idx = mk_index (up 2) is i
-           d = ".." </> "f" </> identifier i
+write_page :: String -> [(Image, Integer)] -> Image -> IO ()
+write_page s is i = 
+    do let idx = mk_index s (up 2) is i
+           d = up 1 </> "f" </> identifier i
            t = "jrd/f/" ++ identifier i
        createDirectoryIfMissing True d
        writeFile (d </> "index.html") (mk_page (up 2) t [ menu (up 2)
@@ -166,10 +169,10 @@ write_page is i =
 
 write_front :: Image -> IO ()
 write_front i = 
-    do let d = ".." </> "f"
+    do let d = up 1 </> "f"
            t = "jeremy drape / photographer" ++ identifier i
        createDirectoryIfMissing True d
-       writeFile (d </> "index.html") (mk_page ".." t [menu (up 1), mk_div i Nothing])
+       writeFile (d </> "index.html") (mk_page (up 1) t [menu (up 1), mk_div i Nothing])
 
 mk_section :: (String,[String]) -> H.Element
 mk_section (t,ls) = H.div [] [H.h2 [] [H.CData t] 
@@ -177,68 +180,169 @@ mk_section (t,ls) = H.div [] [H.h2 [] [H.CData t]
 
 mk_textual :: String -> [(String,[String])] -> IO ()
 mk_textual t ls = do
-  let d = "../f/" ++ t
+  let d = up 1 </> "f" </> t
   createDirectoryIfMissing True d
   let e = replicate 4 (H.br [])
       c = e ++ map mk_section ls
-      p = mk_page "../.." t [menu (up 2), H.div [H.class' "text"] c]
+      p = mk_page (up 2) t [menu (up 2), H.div [H.class' "text"] c]
   writeFile (d </> "index.html") p
+
+mk_projects :: [(String, Integer)] -> IO ()
+mk_projects ls = do
+  let top = up 2
+      t = "projects"
+      d = up 1 </> "f" </> t
+  createDirectoryIfMissing True d
+  let e = replicate 4 (H.br [])
+      c = e ++ map (\(s, i) -> H.div [] [H.a [H.href (top </> "f" </> show i)] [H.CData s]]) ls
+      p = mk_page top  t [menu (up 2), H.div [H.class' "text"] c]
+  writeFile (d </> "index.html") p
+
+write_database :: [Integer] -> IO ()
+write_database ns = 
+    do createDirectoryIfMissing True "db"
+       let key = "fc835bdbc725d54415ff763ee93f7c2d"
+       is <- mapM (fmap fromJust . get_info key) (map show ns)
+       let f (n, i) = writeFile (up 1 </> "f" </> "db" </> show n) (show i)
+       mapM_ f (zip ns is)
+
+read_database :: Integer -> IO Image
+read_database n = 
+    do s <- readFile (up 1 </> "f" </> "db" </> show n)
+       return (read s)
+
+write_picture_set :: String -> [Integer] -> IO [Image]
+write_picture_set s ns = 
+    do is <- mapM read_database ns
+       let js = zip is [1..]
+       mapM_ (write_page s js) is
+       return is
+
+data Flag = Rebuild
+            deriving (Eq, Show)
+    
+options :: [OptDescr Flag]
+options =
+    [ Option ['r'] ["rebuild"] (NoArg Rebuild) "rebuild image database" ]
+
+parse_options :: [String] -> [OptDescr Flag] -> IO ([Flag], [String])
+parse_options as os = 
+    let h = "usage: jrd-f [options]"
+    in case getOpt Permute os as of
+         (o, n, []) -> return (o, n)
+         (_, _, es) -> ioError (userError (concat es ++ usageInfo h os))
+
+rebuild :: IO ()
+rebuild = 
+    let is = jrd_portfolio ++ jrd_projects_2005 ++ jrd_projects_2008
+    in write_database is
 
 main :: IO ()
 main = do
-  xs <- mapM (get_info "fc835bdbc725d54415ff763ee93f7c2d") (map show jrd)
-  let is = catMaybes xs
-      js = zip is [1..]
-  mapM_ (putStrLn . show) is
-  mapM_ (write_page js) is
+  as <- getArgs
+  (os, _) <- parse_options as options
+  if Rebuild `elem` os
+    then rebuild
+    else return ()
+  is <- write_picture_set "portfolio" jrd_portfolio
   write_front (is !! 2)
-  mk_textual "contact" contact
-  mk_textual "bio" bio
-  mk_textual "projects" [("",["coming soon..."])]
+  write_picture_set "projects 2005" jrd_projects_2005
+  write_picture_set "projects 2008" jrd_projects_2008
+  mk_textual "contact" jrd_contact
+  mk_textual "bio" jrd_bio
+  mk_projects [("projects 2008", jrd_projects_2008 !! 0)
+              ,("projects 2005", jrd_projects_2005 !! 0)]
 
-jrd :: [Integer]
-jrd = [2773687772
-      ,2752508645
-      ,2772814665
-      ,2752510459
-      ,2888690149
-      ,2888689563
-      ,2888688277
-      ,2888647043
-      ,2752613797
-      ,2752505961
-      ,2773734560
-      ,2753341584
-      ,2773617644
-      ,2772917061
-      ,2773744908
-      ,2772897849
-      ,2773739848]
+jrd_portfolio :: [Integer]
+jrd_portfolio = 
+    [2773687772
+    ,2752508645
+    ,2772814665
+    ,2752510459
+    ,2888690149
+    ,2888689563
+    ,2888688277
+    ,2888647043
+    ,2752613797
+    ,2752505961
+    ,2773734560
+    ,2753341584
+    ,2773617644
+    ,2772917061
+    ,2773744908
+    ,2772897849
+    ,2773739848]
 
-contact :: [(String,[String])]
-contact = [(""
-           ,[""
-            ,""
-            ,""
-            ,""
-            ,"jeremy drape"
-            ,"email:jeremy@jeremydrape.com"
-            ,"http://www.jeremydrape.com/"
-            ,"telephone:0406 627 085"])]
+jrd_projects_2008 :: [Integer]
+jrd_projects_2008 =
+    [2975815597
+    ,2975930133
+    ,2975678167
+    ,2975830543
+    ,2976523800
+    ,2976807306
+    ,2975943979
+    ,2976795876
+    ,2976515682
+    ,2975591811
+    ,2975667623
+    ,2975588827
+    ,2976781918
+    ,2975938457
+    ,2975673763
+    ,2975820397
+    ,2975959797
+    ,2975842115
+    ,2976690996
+    ,2976518168
+    ,2976800824
+    ,2975812395
+    ,2975955159]
 
-bio :: [(String,[String])]
-bio = [("Education"
-       ,["Bachelor of Fine Art (Honours)"
-        ,"Major - Photography"
-        ,"2000 - 2004"
-        ,"Victorian College of The Arts"])
-      ,("Awards"
-       ,["2003 - Dr David Rosenthal Award, VCA"
-        ,"2001 - Theodor Urbach Award, VCA"])
-      ,("Selected Group Exhibitions"
-       ,["2007 - Polar - Margaret Lawrence Gallery"
-        ,"2007 - Always On My Mind - TCB Gallery"
-        ,"2004 - The Graduate Show - Margaret Lawrence Gallery"
-        ,"2004 - VCA Photography Graduates - Span Galleries"
-        ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
-        ,"2003 - Art of Protest - Bmw Edge Federation Square"])]
+jrd_projects_2005 :: [Integer]
+jrd_projects_2005 =
+    [2816331143
+    ,2977077704
+    ,2976226133
+    ,2816330797
+    ,2816331047
+    ,2977074038
+    ,2976228917
+    ,2975921867
+    ,2976779054
+    ,2977086406
+    ,2816339243
+    ,2977086004
+    ,2975957499
+    ,2817190002
+    ]
+
+jrd_contact :: [(String,[String])]
+jrd_contact = 
+    [(""
+     ,[""
+      ,""
+      ,""
+      ,""
+      ,"jeremy drape"
+      ,"email:jeremy@jeremydrape.com"
+      ,"http://www.jeremydrape.com/"
+      ,"telephone:0406 627 085"])]
+
+jrd_bio :: [(String,[String])]
+jrd_bio = 
+    [("Education"
+     ,["Bachelor of Fine Art (Honours)"
+      ,"Major - Photography"
+      ,"2000 - 2004"
+      ,"Victorian College of The Arts"])
+    ,("Awards"
+     ,["2003 - Dr David Rosenthal Award, VCA"
+      ,"2001 - Theodor Urbach Award, VCA"])
+    ,("Selected Group Exhibitions"
+     ,["2007 - Polar - Margaret Lawrence Gallery"
+      ,"2007 - Always On My Mind - TCB Gallery"
+      ,"2004 - The Graduate Show - Margaret Lawrence Gallery"
+      ,"2004 - VCA Photography Graduates - Span Galleries"
+      ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
+      ,"2003 - Art of Protest - Bmw Edge Federation Square"])]

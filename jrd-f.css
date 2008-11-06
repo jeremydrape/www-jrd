@@ -47,6 +47,10 @@ div.index a {
  text-decoration: none;
 }
 
+span.area {
+ color: #999;
+}
+
 /* f/txt */
 
 div.text {
