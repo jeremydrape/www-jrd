@@ -192,7 +192,7 @@ mk_projects ls = do
       d = up 1 </> "f" </> t
   createDirectoryIfMissing True d
   let e = replicate 4 (H.br [])
-      c = e ++ map (\(s, i) -> H.div [] [H.a [H.href (top </> "f" </> show i)] [H.CData s]]) ls
+      c = e ++ map (\(s, i) -> H.div [] (H.a [H.href (top </> "f" </> show i)] [H.CData s] : replicate 4 (H.br []))) ls
       p = mk_page top  t [menu (up 2), H.div [H.class' "text"] c]
   writeFile (d </> "index.html") p
 
