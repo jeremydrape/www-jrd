@@ -1,7 +1,8 @@
 f:
-	ghc --make jrd-f
-	jrd-f
-	#ghci -Wall jrd-f.hs -e main
+	ghci -Wall jrd-f.hs -e gen_files
+
+r:
+	ghci -Wall jrd-f.hs -e rebuild
 
 a:
 	ghci -Wall jrd-a.hs -e main

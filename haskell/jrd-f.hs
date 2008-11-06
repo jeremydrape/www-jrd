@@ -200,10 +200,11 @@ mk_projects ls = do
 
 write_database :: [Integer] -> IO ()
 write_database ns = 
-    do createDirectoryIfMissing True "db"
+    do let d = up 1 </> "f" </> "db" 
+       createDirectoryIfMissing True d
        let key = "fc835bdbc725d54415ff763ee93f7c2d"
        is <- mapM (fmap fromJust . get_info key) (map show ns)
-       let f (n, i) = writeFile (up 1 </> "f" </> "db" </> show n) (show i)
+       let f (n, i) = writeFile (d </> show n) (show i)
        mapM_ f (zip ns is)
 
 read_database :: Integer -> IO Image
@@ -237,21 +238,24 @@ rebuild =
     let is = jrd_portfolio ++ jrd_projects_2005 ++ jrd_projects_2008
     in write_database is
 
+gen_files :: IO ()
+gen_files = 
+    do is <- write_picture_set "portfolio" jrd_portfolio
+       write_front (is !! 2)
+       write_picture_set "projects 2005" jrd_projects_2005
+       write_picture_set "projects 2008" jrd_projects_2008
+       mk_textual "contact" jrd_contact
+       mk_textual "bio" jrd_bio
+       mk_projects [("projects 2008", jrd_projects_2008 !! 0)
+                   ,("projects 2005", jrd_projects_2005 !! 0)]
+
 main :: IO ()
 main = do
   as <- getArgs
   (os, _) <- parse_options as options
   if Rebuild `elem` os
     then rebuild
-    else return ()
-  is <- write_picture_set "portfolio" jrd_portfolio
-  write_front (is !! 2)
-  write_picture_set "projects 2005" jrd_projects_2005
-  write_picture_set "projects 2008" jrd_projects_2008
-  mk_textual "contact" jrd_contact
-  mk_textual "bio" jrd_bio
-  mk_projects [("projects 2008", jrd_projects_2008 !! 0)
-              ,("projects 2005", jrd_projects_2005 !! 0)]
+    else gen_files
 
 jrd_portfolio :: [Integer]
 jrd_portfolio = 
