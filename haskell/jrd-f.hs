@@ -1,8 +1,6 @@
 import Data.List
 import Data.Maybe
-import System.Console.GetOpt
 import System.Directory
-import System.Environment
 import System.FilePath
 import Text.HTML.Download
 import qualified Text.Html.Light as H
@@ -219,20 +217,6 @@ write_picture_set s ns =
        mapM_ (write_page s js) is
        return is
 
-data Flag = Rebuild
-            deriving (Eq, Show)
-    
-options :: [OptDescr Flag]
-options =
-    [ Option ['r'] ["rebuild"] (NoArg Rebuild) "rebuild image database" ]
-
-parse_options :: [String] -> [OptDescr Flag] -> IO ([Flag], [String])
-parse_options as os = 
-    let h = "usage: jrd-f [options]"
-    in case getOpt Permute os as of
-         (o, n, []) -> return (o, n)
-         (_, _, es) -> ioError (userError (concat es ++ usageInfo h os))
-
 rebuild :: IO ()
 rebuild = 
     let is = jrd_portfolio ++ jrd_projects_2005 ++ jrd_projects_2008
@@ -248,14 +232,6 @@ gen_files =
        mk_textual "bio" jrd_bio
        mk_projects [("projects 2008", jrd_projects_2008 !! 0)
                    ,("projects 2005", jrd_projects_2005 !! 0)]
-
-main :: IO ()
-main = do
-  as <- getArgs
-  (os, _) <- parse_options as options
-  if Rebuild `elem` os
-    then rebuild
-    else gen_files
 
 jrd_portfolio :: [Integer]
 jrd_portfolio = 
@@ -350,3 +326,30 @@ jrd_bio =
       ,"2004 - VCA Photography Graduates - Span Galleries"
       ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
       ,"2003 - Art of Protest - Bmw Edge Federation Square"])]
+
+{-
+import System.Console.GetOpt
+import System.Environment
+
+data Flag = Rebuild
+            deriving (Eq, Show)
+    
+options :: [OptDescr Flag]
+options =
+    [ Option ['r'] ["rebuild"] (NoArg Rebuild) "rebuild image database" ]
+
+parse_options :: [String] -> [OptDescr Flag] -> IO ([Flag], [String])
+parse_options as os = 
+    let h = "usage: jrd-f [options]"
+    in case getOpt Permute os as of
+         (o, n, []) -> return (o, n)
+         (_, _, es) -> ioError (userError (concat es ++ usageInfo h os))
+
+main :: IO ()
+main = do
+  as <- getArgs
+  (os, _) <- parse_options as options
+  if Rebuild `elem` os
+    then rebuild
+    else gen_files
+-}
