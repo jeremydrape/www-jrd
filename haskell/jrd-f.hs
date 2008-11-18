@@ -2,8 +2,8 @@ import Data.List
 import Data.Maybe
 import System.Directory
 import System.FilePath
-import Text.HTML.Download
-import qualified Text.Html.Light as H
+import Text.HTML.Download -- tagsoup
+import qualified Text.HTML.Light as H
 import qualified Text.XML.Light as X
 
 data Image = Image { identifier :: String
@@ -79,29 +79,29 @@ mk_uri s p = let t = maybe "" (\c -> ['_', c]) s
              in "http://farm" ++ farm p ++ ".static.flickr.com/" ++ server p ++ 
                     "/" ++ identifier p ++ "_" ++ secret p ++ t ++ ".jpg"
 
-dv :: String -> [H.Element] -> H.Element
+dv :: String -> [X.Content] -> X.Content
 dv c = H.div [H.class' c]
 
-mk_div :: Image -> Maybe String -> H.Element
+mk_div :: Image -> Maybe String -> X.Content
 mk_div p n = dv "photo" [maybe i f n]
     where i = H.img [H.src (mk_uri Nothing p)
                     ,H.height "500px"
                     ,H.alt (title p)]
           f m = H.a [H.href (up 1 </> m)] [i]
 
-std_html_attr :: [H.Attribute]
+std_html_attr :: [X.Attr]
 std_html_attr = 
     [H.xmlns "http://www.w3.org/1999/xhtml"
     ,H.xml_lang "en"
     ,H.lang "en" ]
 
-std_meta :: String -> String -> [H.Element]
+std_meta :: String -> String -> [X.Content]
 std_meta d s = 
-    [H.title [] [H.CData d]
+    [H.title [] [H.cdata d]
     ,H.meta [H.name "description", H.content d]
     ,H.link [H.rel "stylesheet", H.type' "text/css", H.href s] ]
 
-mk_page :: FilePath -> String -> [H.Element] -> String
+mk_page :: FilePath -> String -> [X.Content] -> String
 mk_page top t e = 
     H.renderXHTML 
      H.xhtml_1_0_strict 
@@ -111,39 +111,39 @@ mk_page top t e =
        ,H.lang "en"] 
        [H.head [] (std_meta t (top </> "jrd-f.css")), H.body [] e])
 
-mk_index :: String -> FilePath -> [(Image, Integer)] -> Image -> H.Element
+mk_index :: String -> FilePath -> [(Image, Integer)] -> Image -> X.Content
 mk_index s top is _c = 
-    let f (i,n) = g (i,n) -- if i == c then H.CData (show n) else (g (i,n))
+    let f (i,n) = g (i,n) -- if i == c then H.cdata (show n) else (g (i,n))
         g (i,n) = H.a 
                   [H.href (top </> "f" </> identifier i)] 
-                  [H.CData (show n)
+                  [H.cdata (show n)
                   ,H.nbsp]
-        h = H.span [H.class' "area"] [H.CData (s ++ ": ")]
-    in dv "index" (h : intersperse (H.CData " ") (map f is))
+        h = H.span [H.class' "area"] [H.cdata (s ++ ": ")]
+    in dv "index" (h : intersperse (H.cdata " ") (map f is))
 
-menu :: FilePath -> H.Element
+menu :: FilePath -> X.Content
 menu top = dv 
        "menu"
-       [dv "jrd" [H.a [H.href "http://jeremydrape.com"] [H.CData "jeremy drape"]
-                 ,H.CData " / photography"]
+       [dv "jrd" [H.a [H.href "http://jeremydrape.com"] [H.cdata "jeremy drape"]
+                 ,H.cdata " / photography"]
        ,dv "lks" (intersperse 
-                  (H.CData ", ")
+                  (H.cdata ", ")
                   [H.a 
                    [H.href (top </> "f" </> show (head jrd_portfolio))] 
-                   [H.CData "portfolio"]
+                   [H.cdata "portfolio"]
                   ,H.a 
                    [H.href (top </> "f" </> "projects")] 
-                   [H.CData "projects"]
+                   [H.cdata "projects"]
                   ,H.a 
                    [H.href "http://horsehunting.blogspot.com/"
                    ,H.target "_blank"] 
-                   [H.CData "blog"]
+                   [H.cdata "blog"]
                   ,H.a 
                    [H.href (top </> "f" </> "bio")] 
-                   [H.CData "bio"]
+                   [H.cdata "bio"]
                   ,H.a 
                    [H.href (top </> "f" </> "contact")]
-                   [H.CData "contact"]])]
+                   [H.cdata "contact"]])]
 
 up :: Int -> FilePath
 up 0 = "."
@@ -172,9 +172,9 @@ write_front i =
        createDirectoryIfMissing True d
        writeFile (d </> "index.html") (mk_page (up 1) t [menu (up 1), mk_div i Nothing])
 
-mk_section :: (String,[String]) -> H.Element
-mk_section (t,ls) = H.div [] [H.h2 [] [H.CData t] 
-                             ,H.div [] (intersperse (H.br []) (map H.CData ls))]
+mk_section :: (String,[String]) -> X.Content
+mk_section (t,ls) = H.div [] [H.h2 [] [H.cdata t] 
+                             ,H.div [] (intersperse (H.br []) (map H.cdata ls))]
 
 mk_textual :: String -> [(String,[String])] -> IO ()
 mk_textual t ls = do
@@ -192,7 +192,7 @@ mk_projects ls = do
       d = up 1 </> "f" </> t
   createDirectoryIfMissing True d
   let e = replicate 4 (H.br [])
-      c = e ++ map (\(s, i) -> H.div [] (H.a [H.href (top </> "f" </> show i)] [H.CData s] : replicate 4 (H.br []))) ls
+      c = e ++ map (\(s, i) -> H.div [] (H.a [H.href (top </> "f" </> show i)] [H.cdata s] : replicate 4 (H.br []))) ls
       p = mk_page top  t [menu (up 2), H.div [H.class' "text"] c]
   writeFile (d </> "index.html") p
 

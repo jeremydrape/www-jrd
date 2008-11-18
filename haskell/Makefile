@@ -1,11 +1,11 @@
 f:
-	ghci -Wall jrd-f.hs -e gen_files
+	ghc -Wall jrd-f.hs -e gen_files
 
 r:
-	ghci -Wall jrd-f.hs -e rebuild
+	ghc -Wall jrd-f.hs -e rebuild
 
 a:
-	ghci -Wall jrd-a.hs -e main
+	ghc -Wall jrd-a.hs -e main
 
 clean:
 	rm -f *.hi *.o jrd-f
