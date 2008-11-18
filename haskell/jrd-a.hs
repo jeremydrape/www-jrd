@@ -3,8 +3,8 @@ import Data.Maybe
 import System.Directory
 import System.FilePath
 import Text.HTML.Download
-import qualified Text.Html.Light as H
-import Text.XML.Light
+import qualified Text.HTML.Light as H
+import qualified Text.XML.Light as X
 
 data Image = Image { identifier :: String
                    , secret :: String
@@ -13,9 +13,9 @@ data Image = Image { identifier :: String
                    , title :: String }
              deriving (Show)
 
-mk_image :: Element -> Image
+mk_image :: X.Element -> Image
 mk_image e = 
-    let f s = fromJust (findAttr (QName s Nothing Nothing) e)
+    let f s = fromJust (X.findAttr (X.QName s Nothing Nothing) e)
     in Image (f "id") (f "secret") (f "server") (f "farm") (f "title")
 
 flickr_rest :: String -> [(String,String)] -> String
@@ -49,15 +49,15 @@ run_query u = do
   s <- openURL u
   return (delete_http_headers (lines s))
 
-mk_query :: String -> IO (Maybe Element)
+mk_query :: String -> IO (Maybe X.Element)
 mk_query u = do
   xs <- run_query u
-  return (parseXMLDoc (concat xs))
+  return (X.parseXMLDoc (concat xs))
 
 get_public_photos :: String -> String -> Integer -> Integer -> IO [Image]
 get_public_photos k u p n = do
   e <- mk_query (get_public_photos_uri k u p n)
-  let ps = maybe [] (findElements (QName "photo" Nothing Nothing)) e
+  let ps = maybe [] (X.findElements (X.QName "photo" Nothing Nothing)) e
   return (map mk_image ps)
  
 mk_uri :: Maybe Char -> Image -> String
@@ -65,29 +65,29 @@ mk_uri s p = let t = maybe "" (\c -> ['_', c]) s
              in "http://farm" ++ farm p ++ ".static.flickr.com/" ++ server p ++ 
                     "/" ++ identifier p ++ "_" ++ secret p ++ t ++ ".jpg"
 
-dv :: String -> [H.Element] -> H.Element
+dv :: String -> [X.Content] -> X.Content
 dv c = H.div [H.class' c]
 
-mk_div :: Image -> H.Element
+mk_div :: Image -> X.Content
 mk_div p =
     let l e = [H.a [H.href (mk_uri Nothing p)] e]
         i = l [H.img [H.src (mk_uri (Just 's') p)]]
-        t = l [H.CData (title p)]
+        t = l [H.cdata (title p)]
     in dv "node-a" [dv "image-a" i, dv "text-a" t]
 
-std_html_attr :: [H.Attribute]
+std_html_attr :: [X.Attr]
 std_html_attr = 
     [H.xmlns "http://www.w3.org/1999/xhtml"
     ,H.xml_lang "en"
     ,H.lang "en" ]
 
-std_meta :: String -> String -> [H.Element]
+std_meta :: String -> String -> [X.Content]
 std_meta d s = 
-    [H.title [] [H.CData d]
+    [H.title [] [H.cdata d]
     ,H.meta [H.name "description", H.content d]
     ,H.link [H.rel "stylesheet", H.type' "text/css", H.href s] ]
 
-mk_page :: [H.Element] -> String
+mk_page :: [X.Content] -> String
 mk_page e = 
     H.renderXHTML 
      H.xhtml_1_0_strict 
