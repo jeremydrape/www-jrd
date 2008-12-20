@@ -15,7 +15,7 @@ data Image = Image { identifier :: String
 
 mk_image :: X.Element -> Image
 mk_image e = 
-    let f s = maybe "" id (X.findAttr (X.QName s Nothing Nothing) e)
+    let f s = fromMaybe "" (X.findAttr (X.QName s Nothing Nothing) e)
     in Image (f "id") (f "secret") (f "server") (f "farm") (f "title")
 
 flickr_rest :: String -> [(String,String)] -> String
@@ -47,10 +47,10 @@ http_response_parts :: [String] -> ([String], [String])
 http_response_parts xs =
   let starts_with c (x:_) = c == x
       starts_with _ _ = False
-  in span (not . (starts_with '<')) xs
+  in span (not . starts_with '<') xs
 
 delete_http_headers :: [String] -> [String]
-delete_http_headers xs = snd (http_response_parts xs)
+delete_http_headers = snd . http_response_parts
 
 run_query :: String -> IO [String]
 run_query u = do
@@ -230,8 +230,10 @@ gen_files =
        write_picture_set "projects 2008" jrd_projects_2008
        mk_textual "contact" jrd_contact
        mk_textual "bio" jrd_bio
-       mk_projects [("projects 2008", jrd_projects_2008 !! 0)
-                   ,("projects 2005", jrd_projects_2005 !! 0)]
+       let (p8:_) = jrd_projects_2008
+           (p5:_) = jrd_projects_2005
+       mk_projects [("projects 2008", p8)
+                   ,("projects 2005", p5)]
 
 jrd_portfolio :: [Integer]
 jrd_portfolio = 

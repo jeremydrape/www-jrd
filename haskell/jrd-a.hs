@@ -39,10 +39,10 @@ http_response_parts :: [String] -> ([String], [String])
 http_response_parts xs =
   let starts_with c (x:_) = c == x
       starts_with _ _ = False
-  in span (not . (starts_with '<')) xs
+  in span (not . starts_with '<') xs
 
 delete_http_headers :: [String] -> [String]
-delete_http_headers xs = snd (http_response_parts xs)
+delete_http_headers = snd . http_response_parts
 
 run_query :: String -> IO [String]
 run_query u = do
