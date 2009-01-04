@@ -57,11 +57,11 @@
         (a (attr (href (list top "portfolio/1/stairs/")))
            "PORTFOLIO")
         (br noattr))
-;;        (a (attr (href (list top "portfolio/2/ferry/")))
-;;           "PORTFOLIO 2"))
-;;        (br noattr)
-;;        (a (attr (href (list top "portfolio/3/annie/")))
-;;           "PORTFOLIO 3"))
+     ;;        (a (attr (href (list top "portfolio/2/ferry/")))
+     ;;           "PORTFOLIO 2"))
+     ;;        (br noattr)
+     ;;        (a (attr (href (list top "portfolio/3/annie/")))
+     ;;           "PORTFOLIO 3"))
      (p (w/class "genera")
         (a (attr (href (list top "about/")))
            "CV")
@@ -154,37 +154,41 @@
      "2002 - SIGNAGE - FOUND PROJECT SPACE<br/>"))))
 
 (define portfolio
-  (lambda (curr prev next txt top series next-series)
-    (let ((header
-           (p
-            (w/class "name")
-            (a (attr (href top)) "JEREMY DRAPE")))
-          (footer
-           (list))
-          (right
-           (a
-            (attr
-             (title "forward")
-             (href (list "../../" next-series "/" next)))
-            (img
-             (attr (class "photo")
-                   (src (list top "images/portfolio/" series "/" curr ".jpeg"))
-                   (alt (list curr ", photo by jeremy drape"))))))
-          (left
-           (div
-            noattr
-            (mk-left-menu top)
-            (p 
-             (w/class "stepper")
-             (a 
-              (attr (title "back") 
-                    (href (list "../" prev))) 
-              "&larr;")
-             "&nbsp;"
-             (a 
-              (attr (title "forward") 
-                    (href (list "../" next))) 
-              "&rarr;")))))
+  (lambda (curr prev next txt top series prev-series next-series)
+    (let* ((header
+            (p
+             (w/class "name")
+             (a (attr (href top)) "JEREMY DRAPE")))
+           (footer
+            (list))
+           (fwd
+            (list "../../" next-series "/" next))
+           (bck
+            (list "../../" prev-series "/" prev))
+           (right
+            (a
+             (attr
+              (title "forward")
+              (href fwd))
+             (img
+              (attr (class "photo")
+                    (src (list top "images/portfolio/" series "/" curr ".jpeg"))
+                    (alt (list curr ", photo by jeremy drape"))))))
+           (left
+            (div
+             noattr
+             (mk-left-menu top)
+             (p 
+              (w/class "stepper")
+              (a 
+               (attr (title "back") 
+                     (href bck)) 
+               "&larr;")
+              "&nbsp;"
+              (a 
+               (attr (title "forward") 
+                     (href fwd)) 
+               "&rarr;")))))
       (html
        std-html-attr
        (head
@@ -219,9 +223,9 @@
                  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd")
                 tree)))))))
 
-(write-file front "..")
-(write-file contact "../contact")
-(write-file about "../about")
+(write-file front "../o")
+(write-file contact "../o/contact")
+(write-file about "../o/about")
 
 (define series/portfolio/1
   (list
@@ -285,8 +289,9 @@
                             (t n)
                             top
                             (s n)
+                            (s (- n 1))
                             (s (+ n 1)))
-                 (string-append "../portfolio/" (s n) "/" (i n))))
+                 (string-append "../o/portfolio/" (s n) "/" (i n))))
               (enum-from-to 0 (- m 1)))))
 
 (make-series series/portfolio/1 "../../../")

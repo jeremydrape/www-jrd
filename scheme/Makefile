@@ -3,7 +3,7 @@ ikarus:
 	ikarus jrd.scm
 
 clean: 
-	rm -fR ../index.html \
-		../about \
-		../contact \
-		../portfolio
+	rm -fR ../o/index.html \
+		../o/about \
+		../o/contact \
+		../o/portfolio
