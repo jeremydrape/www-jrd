@@ -37,7 +37,7 @@ mk_page top t e =
        [H.xmlns "http://www.w3.org/1999/xhtml"
        ,H.xml_lang "en"
        ,H.lang "en"]
-       [H.head [] (std_meta t (top </> "jrd-f.css")), H.body [] e])
+       [H.head [] (std_meta t (top </> "css" </> "jrd-f.css")), H.body [] e])
 
 mk_index :: String -> FilePath -> [(Image, Integer)] -> Image -> X.Content
 mk_index s top is _c =
@@ -49,8 +49,93 @@ mk_index s top is _c =
         h = H.span [H.class' "area"] [H.cdata (s ++ ": ")]
     in dv "index" (h : intersperse (H.cdata " ") (map f is))
 
-menu :: FilePath -> X.Content
-menu top = dv
+up :: Int -> FilePath
+up 0 = "."
+up 1 = ".."
+up n = ".." </> up (n - 1)
+
+find_next :: [Image] -> Image -> Maybe String
+find_next (i:j:xs) k | i == k = Just (identifier j)
+                     | otherwise = find_next (j:xs) k
+find_next _ _ = Nothing
+
+write_page :: String -> [(Image, Integer)] -> Image -> IO ()
+write_page s is i =
+    do let idx = mk_index s (up 2) is i
+           d = up 1 </> "f" </> identifier i
+           t = "jrd/f/" ++ identifier i
+           pg = mk_page (up 2) t [ jrd_menu (up 2)
+                                 , mk_div i (find_next (map fst is) i)
+                                 , idx ]
+       createDirectoryIfMissing True d
+       writeFile (d </> "index.html") pg
+
+write_front :: Image -> IO ()
+write_front i =
+    do let d = up 1 </> "f"
+           t = "jeremy drape / photographer" ++ identifier i
+           pg = mk_page (up 1) t [jrd_menu (up 1), mk_div i Nothing]
+       createDirectoryIfMissing True d
+       writeFile (d </> "index.html") pg
+
+mk_section :: (String,[String]) -> X.Content
+mk_section (t,ls) = H.div [] [H.h2 [] [H.cdata t]
+                             ,H.div [] (intersperse (H.br []) (map H.cdata ls))]
+
+mk_textual :: String -> [(String,[String])] -> IO ()
+mk_textual t ls = do
+  let d = up 1 </> "f" </> t
+  createDirectoryIfMissing True d
+  let e = replicate 4 (H.br [])
+      c = e ++ map mk_section ls
+      p = mk_page (up 2) t [jrd_menu (up 2), H.div [H.class' "text"] c]
+  writeFile (d </> "index.html") p
+
+mk_projects :: [(String, Integer)] -> IO ()
+mk_projects ls = do
+  let top = up 2
+      t = "projects"
+      d = up 1 </> "f" </> t
+  createDirectoryIfMissing True d
+  let e = replicate 4 (H.br [])
+      f (s, i) = H.div 
+                  [] 
+                  (H.a
+                   [H.href (top </> "f" </> show i)] 
+                   [H.cdata s] : replicate 4 (H.br []))
+      c = e ++ map f ls
+      p = mk_page top  t [jrd_menu (up 2), H.div [H.class' "text"] c]
+  writeFile (d </> "index.html") p
+
+read_database :: Integer -> IO Image
+read_database n =
+    do s <- readFile (up 1 </> "f" </> "db" </> show n)
+       return (read s)
+
+write_picture_set :: String -> [Integer] -> IO [Image]
+write_picture_set s ns =
+    do is <- mapM read_database ns
+       let js = zip is [1..]
+       mapM_ (write_page s js) is
+       return is
+
+gen_files :: IO ()
+gen_files =
+    do is <- write_picture_set "portfolio" jrd_portfolio
+       write_front (is !! 2)
+       write_picture_set "projects 2005" jrd_projects_2005
+       write_picture_set "projects 2008" jrd_projects_2008
+       mk_textual "contact" jrd_contact
+       mk_textual "bio" jrd_bio
+       let (p8:_) = jrd_projects_2008
+           (p5:_) = jrd_projects_2005
+       mk_projects [("projects 2008", p8)
+                   ,("projects 2005", p5)]
+
+-- * jrd content
+
+jrd_menu :: FilePath -> X.Content
+jrd_menu top = dv
        "menu"
        [dv "jrd" [H.a [H.href "http://jeremydrape.com"] [H.cdata "jeremy drape"]
                  ,H.cdata " / photography"]
@@ -72,103 +157,6 @@ menu top = dv
                   ,H.a
                    [H.href (top </> "f" </> "contact")]
                    [H.cdata "contact"]])]
-
-up :: Int -> FilePath
-up 0 = "."
-up 1 = ".."
-up n = ".." </> up (n - 1)
-
-find_next :: [Image] -> Image -> Maybe String
-find_next (i:j:xs) k | i == k = Just (identifier j)
-                     | otherwise = find_next (j:xs) k
-find_next _ _ = Nothing
-
-write_page :: String -> [(Image, Integer)] -> Image -> IO ()
-write_page s is i =
-    do let idx = mk_index s (up 2) is i
-           d = up 1 </> "f" </> identifier i
-           t = "jrd/f/" ++ identifier i
-           pg = mk_page (up 2) t [ menu (up 2)
-                                 , mk_div i (find_next (map fst is) i)
-                                 , idx ]
-       createDirectoryIfMissing True d
-       writeFile (d </> "index.html") pg
-
-write_front :: Image -> IO ()
-write_front i =
-    do let d = up 1 </> "f"
-           t = "jeremy drape / photographer" ++ identifier i
-           pg = mk_page (up 1) t [menu (up 1), mk_div i Nothing]
-       createDirectoryIfMissing True d
-       writeFile (d </> "index.html") pg
-
-mk_section :: (String,[String]) -> X.Content
-mk_section (t,ls) = H.div [] [H.h2 [] [H.cdata t]
-                             ,H.div [] (intersperse (H.br []) (map H.cdata ls))]
-
-mk_textual :: String -> [(String,[String])] -> IO ()
-mk_textual t ls = do
-  let d = up 1 </> "f" </> t
-  createDirectoryIfMissing True d
-  let e = replicate 4 (H.br [])
-      c = e ++ map mk_section ls
-      p = mk_page (up 2) t [menu (up 2), H.div [H.class' "text"] c]
-  writeFile (d </> "index.html") p
-
-mk_projects :: [(String, Integer)] -> IO ()
-mk_projects ls = do
-  let top = up 2
-      t = "projects"
-      d = up 1 </> "f" </> t
-  createDirectoryIfMissing True d
-  let e = replicate 4 (H.br [])
-      f (s, i) = H.div 
-                  [] 
-                  (H.a
-                   [H.href (top </> "f" </> show i)] 
-                   [H.cdata s] : replicate 4 (H.br []))
-      c = e ++ map f ls
-      p = mk_page top  t [menu (up 2), H.div [H.class' "text"] c]
-  writeFile (d </> "index.html") p
-
-write_database :: [Integer] -> IO ()
-write_database ns =
-    do let d = up 1 </> "f" </> "db"
-       createDirectoryIfMissing True d
-       let key = "fc835bdbc725d54415ff763ee93f7c2d"
-       is <- mapM (fmap fromJust . get_info key) (map show ns)
-       let f (n, i) = writeFile (d </> show n) (show i)
-       mapM_ f (zip ns is)
-
-read_database :: Integer -> IO Image
-read_database n =
-    do s <- readFile (up 1 </> "f" </> "db" </> show n)
-       return (read s)
-
-write_picture_set :: String -> [Integer] -> IO [Image]
-write_picture_set s ns =
-    do is <- mapM read_database ns
-       let js = zip is [1..]
-       mapM_ (write_page s js) is
-       return is
-
-rebuild :: IO ()
-rebuild =
-    let is = jrd_portfolio ++ jrd_projects_2005 ++ jrd_projects_2008
-    in write_database is
-
-gen_files :: IO ()
-gen_files =
-    do is <- write_picture_set "portfolio" jrd_portfolio
-       write_front (is !! 2)
-       write_picture_set "projects 2005" jrd_projects_2005
-       write_picture_set "projects 2008" jrd_projects_2008
-       mk_textual "contact" jrd_contact
-       mk_textual "bio" jrd_bio
-       let (p8:_) = jrd_projects_2008
-           (p5:_) = jrd_projects_2005
-       mk_projects [("projects 2008", p8)
-                   ,("projects 2005", p5)]
 
 jrd_portfolio :: [Integer]
 jrd_portfolio =
@@ -263,3 +251,19 @@ jrd_bio =
       ,"2004 - VCA Photography Graduates - Span Galleries"
       ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
       ,"2003 - Art of Protest - Bmw Edge Federation Square"])]
+
+-- * jrd-f/rebuild : database generator
+
+write_database :: [Integer] -> IO ()
+write_database ns =
+    do let d = up 1 </> "f" </> "db"
+       createDirectoryIfMissing True d
+       let key = "fc835bdbc725d54415ff763ee93f7c2d"
+       is <- mapM (fmap fromJust . get_info key) (map show ns)
+       let f (n, i) = writeFile (d </> show n) (show i)
+       mapM_ f (zip ns is)
+
+rebuild :: IO ()
+rebuild =
+    let is = jrd_portfolio ++ jrd_projects_2005 ++ jrd_projects_2008
+    in write_database is
