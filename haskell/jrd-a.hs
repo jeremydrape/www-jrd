@@ -17,22 +17,23 @@ mk_div p =
     in dv "node-a" [dv "image-a" i, dv "text-a" t]
 
 std_html_attr :: [X.Attr]
-std_html_attr = 
+std_html_attr =
     [H.xmlns "http://www.w3.org/1999/xhtml"
     ,H.xml_lang "en"
     ,H.lang "en" ]
 
 std_meta :: String -> String -> [X.Content]
-std_meta d s = 
+std_meta d s =
     [H.title [] [H.cdata d]
     ,H.meta [H.name "description", H.content d]
     ,H.link [H.rel "stylesheet", H.type' "text/css", H.href s] ]
 
 mk_page :: [X.Content] -> String
-mk_page e = 
-    H.renderXHTML 
-     H.xhtml_1_0_strict 
-      (H.html [] [H.head [] (std_meta "tst" "../../jrd-f.css"), H.body [] e])
+mk_page e =
+    let m = std_meta "jrd/f/a" "../../css/jrd-f.css"
+    in H.renderXHTML
+       H.xhtml_1_0_strict
+       (H.html [] [H.head [] m, H.body [] e])
 
 compareBy :: Ord a => (x -> a) -> x -> x -> Ordering
 compareBy f x y = compare (f x) (f y)
