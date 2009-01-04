@@ -13,35 +13,11 @@ data Image = Image { identifier :: String
                    , title :: String }
              deriving (Read, Show, Eq)
 
-mk_image :: X.Element -> Image
-mk_image e = 
-    let f s = fromMaybe "" (X.findAttr (X.QName s Nothing Nothing) e)
-    in Image (f "id") (f "secret") (f "server") (f "farm") (f "title")
 
-flickr_rest :: String -> [(String,String)] -> String
-flickr_rest m a = 
-    let xs = map (\(k,v) -> "&" ++ k ++ "=" ++ v) a
-    in "http://api.flickr.com/services/rest/?method=" ++ m ++ concat xs
-
-flickr_rest_keyed :: String -> String -> [(String,String)] -> String
-flickr_rest_keyed m k a = flickr_rest m (("api_key", k) : a)
-
-get_info_uri :: String -> String -> String
-get_info_uri k n = 
-    flickr_rest_keyed "flickr.photos.getInfo"
-                      k
-                      [("photo_id", n)]
-                      
-get_public_photos_uri :: String -> String -> Integer -> Integer -> String
-get_public_photos_uri k u p n = 
-    flickr_rest_keyed "flickr.people.getPublicPhotos" 
-                      k 
-                      [("user_id", u)
-                      ,("page", show p)
-                      ,("per_page", show n)]
-
-get_public_photo_uri :: String -> String -> Integer -> String
-get_public_photo_uri k u n = get_public_photos_uri k u n 1
+query :: String -> [(String,String)] -> String
+query h a =
+    let xs = intercalate "&" (map (\(k, v) -> concat [k, "=", v]) a)
+    in concat [h, "?", xs]
 
 http_response_parts :: [String] -> ([String], [String])
 http_response_parts xs =
@@ -52,96 +28,121 @@ http_response_parts xs =
 delete_http_headers :: [String] -> [String]
 delete_http_headers = snd . http_response_parts
 
-run_query :: String -> IO [String]
+run_query :: String -> IO (Maybe X.Element)
 run_query u = do
   s <- openURL u
-  return (delete_http_headers (lines s))
-
-mk_query :: String -> IO (Maybe X.Element)
-mk_query u = do
-  xs <- run_query u
+  let xs = delete_http_headers (lines s)
   return (X.parseXMLDoc (concat xs))
+
+mk_image :: X.Element -> Image
+mk_image e =
+    let f s = fromMaybe "" (X.findAttr (X.QName s Nothing Nothing) e)
+    in Image (f "id") (f "secret") (f "server") (f "farm") (f "title")
+
+flickr_rest :: String -> String -> [(String,String)] -> String
+flickr_rest k m a =
+    let h = "http://api.flickr.com/services/rest/"
+    in query h (("method", m) : ("api_key", k) : a)
+
+get_info_uri :: String -> String -> String
+get_info_uri k n =
+    flickr_rest k
+                "flickr.photos.getInfo"
+                [("photo_id", n)]
+
+get_public_photos_uri :: String -> String -> Integer -> Integer -> String
+get_public_photos_uri k u p n =
+    flickr_rest k
+                "flickr.people.getPublicPhotos"
+                [("user_id", u)
+                ,("page", show p)
+                ,("per_page", show n)]
+
+get_public_photo_uri :: String -> String -> Integer -> String
+get_public_photo_uri k u n = get_public_photos_uri k u n 1
 
 get_public_photos :: String -> String -> Integer -> Integer -> IO [Image]
 get_public_photos k u p n = do
-  e <- mk_query (get_public_photos_uri k u p n)
+  e <- run_query (get_public_photos_uri k u p n)
   let ps = maybe [] (X.findElements (X.QName "photo" Nothing Nothing)) e
   return (map mk_image ps)
- 
+
 get_info :: String -> String -> IO (Maybe Image)
 get_info k n = do
-  e <- mk_query (get_info_uri k n)
+  e <- run_query (get_info_uri k n)
   let p = maybe Nothing (X.findElement (X.QName "photo" Nothing Nothing)) e
   return (maybe Nothing (Just . mk_image) p)
 
 mk_uri :: Maybe Char -> Image -> String
-mk_uri s p = let t = maybe "" (\c -> ['_', c]) s
-             in "http://farm" ++ farm p ++ ".static.flickr.com/" ++ server p ++ 
-                    "/" ++ identifier p ++ "_" ++ secret p ++ t ++ ".jpg"
+mk_uri s p =
+    let t = maybe "" (\c -> ['_', c]) s
+    in concat ["http://farm", farm p, ".static.flickr.com/", server p
+              ,"/", identifier p, "_", secret p, t, ".jpg"]
 
 dv :: String -> [X.Content] -> X.Content
 dv c = H.div [H.class' c]
 
 mk_div :: Image -> Maybe String -> X.Content
-mk_div p n = dv "photo" [maybe i f n]
-    where i = H.img [H.src (mk_uri Nothing p)
-                    ,H.height "500px"
-                    ,H.alt (title p)]
-          f m = H.a [H.href (up 1 </> m)] [i]
+mk_div p n =
+    let i = H.img [H.src (mk_uri Nothing p)
+                  ,H.height "500px"
+                  ,H.alt (title p)]
+        f m = H.a [H.href (up 1 </> m)] [i]
+    in dv "photo" [maybe i f n]
 
 std_html_attr :: [X.Attr]
-std_html_attr = 
+std_html_attr =
     [H.xmlns "http://www.w3.org/1999/xhtml"
     ,H.xml_lang "en"
     ,H.lang "en" ]
 
 std_meta :: String -> String -> [X.Content]
-std_meta d s = 
+std_meta d s =
     [H.title [] [H.cdata d]
     ,H.meta [H.name "description", H.content d]
     ,H.link [H.rel "stylesheet", H.type' "text/css", H.href s] ]
 
 mk_page :: FilePath -> String -> [X.Content] -> String
-mk_page top t e = 
-    H.renderXHTML 
-     H.xhtml_1_0_strict 
-      (H.html 
+mk_page top t e =
+    H.renderXHTML
+     H.xhtml_1_0_strict
+      (H.html
        [H.xmlns "http://www.w3.org/1999/xhtml"
        ,H.xml_lang "en"
-       ,H.lang "en"] 
+       ,H.lang "en"]
        [H.head [] (std_meta t (top </> "jrd-f.css")), H.body [] e])
 
 mk_index :: String -> FilePath -> [(Image, Integer)] -> Image -> X.Content
-mk_index s top is _c = 
+mk_index s top is _c =
     let f (i,n) = g (i,n) -- if i == c then H.cdata (show n) else (g (i,n))
-        g (i,n) = H.a 
-                  [H.href (top </> "f" </> identifier i)] 
+        g (i,n) = H.a
+                  [H.href (top </> "f" </> identifier i)]
                   [H.cdata (show n)
                   ,H.nbsp]
         h = H.span [H.class' "area"] [H.cdata (s ++ ": ")]
     in dv "index" (h : intersperse (H.cdata " ") (map f is))
 
 menu :: FilePath -> X.Content
-menu top = dv 
+menu top = dv
        "menu"
        [dv "jrd" [H.a [H.href "http://jeremydrape.com"] [H.cdata "jeremy drape"]
                  ,H.cdata " / photography"]
-       ,dv "lks" (intersperse 
+       ,dv "lks" (intersperse
                   (H.cdata ", ")
-                  [H.a 
-                   [H.href (top </> "f" </> show (head jrd_portfolio))] 
+                  [H.a
+                   [H.href (top </> "f" </> show (head jrd_portfolio))]
                    [H.cdata "portfolio"]
-                  ,H.a 
-                   [H.href (top </> "f" </> "projects")] 
+                  ,H.a
+                   [H.href (top </> "f" </> "projects")]
                    [H.cdata "projects"]
-                  ,H.a 
+                  ,H.a
                    [H.href "http://horsehunting.blogspot.com/"
-                   ,H.target "_blank"] 
+                   ,H.target "_blank"]
                    [H.cdata "blog"]
-                  ,H.a 
-                   [H.href (top </> "f" </> "bio")] 
+                  ,H.a
+                   [H.href (top </> "f" </> "bio")]
                    [H.cdata "bio"]
-                  ,H.a 
+                  ,H.a
                    [H.href (top </> "f" </> "contact")]
                    [H.cdata "contact"]])]
 
@@ -156,7 +157,7 @@ find_next (i:j:xs) k | i == k = Just (identifier j)
 find_next _ _ = Nothing
 
 write_page :: String -> [(Image, Integer)] -> Image -> IO ()
-write_page s is i = 
+write_page s is i =
     do let idx = mk_index s (up 2) is i
            d = up 1 </> "f" </> identifier i
            t = "jrd/f/" ++ identifier i
@@ -166,14 +167,14 @@ write_page s is i =
                                                         , idx ])
 
 write_front :: Image -> IO ()
-write_front i = 
+write_front i =
     do let d = up 1 </> "f"
            t = "jeremy drape / photographer" ++ identifier i
        createDirectoryIfMissing True d
        writeFile (d </> "index.html") (mk_page (up 1) t [menu (up 1), mk_div i Nothing])
 
 mk_section :: (String,[String]) -> X.Content
-mk_section (t,ls) = H.div [] [H.h2 [] [H.cdata t] 
+mk_section (t,ls) = H.div [] [H.h2 [] [H.cdata t]
                              ,H.div [] (intersperse (H.br []) (map H.cdata ls))]
 
 mk_textual :: String -> [(String,[String])] -> IO ()
@@ -197,8 +198,8 @@ mk_projects ls = do
   writeFile (d </> "index.html") p
 
 write_database :: [Integer] -> IO ()
-write_database ns = 
-    do let d = up 1 </> "f" </> "db" 
+write_database ns =
+    do let d = up 1 </> "f" </> "db"
        createDirectoryIfMissing True d
        let key = "fc835bdbc725d54415ff763ee93f7c2d"
        is <- mapM (fmap fromJust . get_info key) (map show ns)
@@ -206,24 +207,24 @@ write_database ns =
        mapM_ f (zip ns is)
 
 read_database :: Integer -> IO Image
-read_database n = 
+read_database n =
     do s <- readFile (up 1 </> "f" </> "db" </> show n)
        return (read s)
 
 write_picture_set :: String -> [Integer] -> IO [Image]
-write_picture_set s ns = 
+write_picture_set s ns =
     do is <- mapM read_database ns
        let js = zip is [1..]
        mapM_ (write_page s js) is
        return is
 
 rebuild :: IO ()
-rebuild = 
+rebuild =
     let is = jrd_portfolio ++ jrd_projects_2005 ++ jrd_projects_2008
     in write_database is
 
 gen_files :: IO ()
-gen_files = 
+gen_files =
     do is <- write_picture_set "portfolio" jrd_portfolio
        write_front (is !! 2)
        write_picture_set "projects 2005" jrd_projects_2005
@@ -236,7 +237,7 @@ gen_files =
                    ,("projects 2005", p5)]
 
 jrd_portfolio :: [Integer]
-jrd_portfolio = 
+jrd_portfolio =
     [2773687772
     ,2752508645
     ,2772814665
@@ -300,7 +301,7 @@ jrd_projects_2005 =
     ]
 
 jrd_contact :: [(String,[String])]
-jrd_contact = 
+jrd_contact =
     [(""
      ,[""
       ,""
@@ -312,7 +313,7 @@ jrd_contact =
       ,"telephone:0406 627 085"])]
 
 jrd_bio :: [(String,[String])]
-jrd_bio = 
+jrd_bio =
     [("Education"
      ,["Bachelor of Fine Art (Honours)"
       ,"Major - Photography"
@@ -328,30 +329,3 @@ jrd_bio =
       ,"2004 - VCA Photography Graduates - Span Galleries"
       ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
       ,"2003 - Art of Protest - Bmw Edge Federation Square"])]
-
-{-
-import System.Console.GetOpt
-import System.Environment
-
-data Flag = Rebuild
-            deriving (Eq, Show)
-    
-options :: [OptDescr Flag]
-options =
-    [ Option ['r'] ["rebuild"] (NoArg Rebuild) "rebuild image database" ]
-
-parse_options :: [String] -> [OptDescr Flag] -> IO ([Flag], [String])
-parse_options as os = 
-    let h = "usage: jrd-f [options]"
-    in case getOpt Permute os as of
-         (o, n, []) -> return (o, n)
-         (_, _, es) -> ioError (userError (concat es ++ usageInfo h os))
-
-main :: IO ()
-main = do
-  as <- getArgs
-  (os, _) <- parse_options as options
-  if Rebuild `elem` os
-    then rebuild
-    else gen_files
--}
