@@ -1,1 +1,18 @@
 www-jrd - jrd website
+
+directory structure:
+
+  css                - css files
+  f                  - html files (GENERATED)
+  f/db               - flickr database files (GENERATED)
+  haskell            - haskell source code
+  haskell/Flickr.hs  - minimal flickr api bindings
+  haskell/jrd-f.hs   - code to generate site proper (f/)
+  haskell/jrd-a.hs   - code to generate archive list (f/a/)
+
+requirements:
+
+  ghc                - http://haskell.org/ghc/
+  html-minimalist    - darcs get http://slavepianos.org/rd/sw/html-minimalist
+  xml                - git clone git://code.galois.com/xml.git
+  tagsoup            - darcs get http://www.cs.york.ac.uk/fp/darcs/tagsoup
