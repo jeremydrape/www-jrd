@@ -251,19 +251,3 @@ jrd_bio =
       ,"2004 - VCA Photography Graduates - Span Galleries"
       ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
       ,"2003 - Art of Protest - Bmw Edge Federation Square"])]
-
--- * jrd-f/rebuild : database generator
-
-write_database :: [Integer] -> IO ()
-write_database ns =
-    do let d = up 1 </> "f" </> "db"
-       createDirectoryIfMissing True d
-       let key = "fc835bdbc725d54415ff763ee93f7c2d"
-       is <- mapM (fmap fromJust . get_info key) (map show ns)
-       let f (n, i) = writeFile (d </> show n) (show i)
-       mapM_ f (zip ns is)
-
-rebuild :: IO ()
-rebuild =
-    let is = jrd_portfolio ++ jrd_projects_2005 ++ jrd_projects_2008
-    in write_database is
