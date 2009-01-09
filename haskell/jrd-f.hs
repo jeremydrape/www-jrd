@@ -6,16 +6,15 @@ import System.FilePath
 import qualified Text.HTML.Light as H
 import qualified Text.XML.Light as X
 
-dv :: String -> [X.Content] -> X.Content
-dv c = H.div [H.class' c]
+cdiv :: String -> [X.Content] -> X.Content
+cdiv c = H.div [H.class' c]
 
 mk_div :: Image -> Maybe String -> X.Content
 mk_div p n =
     let i = H.img [H.src (mk_uri Nothing p)
-                  ,H.height "500px"
                   ,H.alt (title p)]
         f m = H.a [H.href (up 1 </> m)] [i]
-    in dv "photo" [maybe i f n]
+    in cdiv "photo" [maybe i f n]
 
 std_html_attr :: [X.Attr]
 std_html_attr =
@@ -47,7 +46,7 @@ mk_index s top is _c =
                   [H.cdata (show n)
                   ,H.nbsp]
         h = H.span [H.class' "area"] [H.cdata (s ++ ": ")]
-    in dv "index" (h : intersperse (H.cdata " ") (map f is))
+    in cdiv "index" (h : intersperse (H.cdata " ") (map f is))
 
 up :: Int -> FilePath
 up 0 = "."
@@ -73,7 +72,7 @@ write_page s is i =
 write_front :: Image -> IO ()
 write_front i =
     do let d = up 1 </> "f"
-           t = "jeremy drape / photographer" ++ identifier i
+           t = "jeremy drape / photographer"
            pg = mk_page (up 1) t [jrd_menu (up 1), mk_div i Nothing]
        createDirectoryIfMissing True d
        writeFile (d </> "index.html") pg
@@ -138,28 +137,32 @@ gen_files =
 -- * jrd content
 
 jrd_menu :: FilePath -> X.Content
-jrd_menu top = dv
+jrd_menu top = cdiv
        "menu"
-       [dv "jrd" [H.a [H.href "http://jeremydrape.com"] [H.cdata "jeremy drape"]
-                 ,H.cdata " / photography"]
-       ,dv "lks" (intersperse
-                  (H.cdata ", ")
-                  [H.a
-                   [H.href (top </> "f" </> show (head jrd_portfolio))]
-                   [H.cdata "portfolio"]
-                  ,H.a
-                   [H.href (top </> "f" </> "projects")]
-                   [H.cdata "projects"]
-                  ,H.a
-                   [H.href "http://horsehunting.blogspot.com/"
-                   ,H.target "_blank"]
-                   [H.cdata "blog"]
-                  ,H.a
-                   [H.href (top </> "f" </> "bio")]
-                   [H.cdata "bio"]
-                  ,H.a
-                   [H.href (top </> "f" </> "contact")]
-                   [H.cdata "contact"]])]
+       [cdiv 
+        "jrd" 
+        [H.a [H.href "http://jeremydrape.com"] [H.cdata "jeremy drape"]
+        ,H.cdata " / photography"]
+       ,cdiv 
+        "lks"
+        (intersperse
+         (H.cdata ", ")
+         [H.a
+          [H.href (top </> "f" </> show (head jrd_portfolio))]
+          [H.cdata "portfolio"]
+         ,H.a
+          [H.href (top </> "f" </> "projects")]
+          [H.cdata "projects"]
+         ,H.a
+          [H.href "http://horsehunting.blogspot.com/"
+          ,H.target "_blank"]
+          [H.cdata "blog"]
+         ,H.a
+          [H.href (top </> "f" </> "bio")]
+          [H.cdata "bio"]
+         ,H.a
+          [H.href (top </> "f" </> "contact")]
+          [H.cdata "contact"]])]
 
 jrd_portfolio :: [Integer]
 jrd_portfolio =
