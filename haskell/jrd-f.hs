@@ -166,7 +166,8 @@ jrd_menu top = cdiv
 
 jrd_portfolio :: [Integer]
 jrd_portfolio =
-    [2773687772
+    [3383969460
+    ,2773687772
     ,2752508645
     ,2772814665
     ,2752510459
@@ -183,7 +184,6 @@ jrd_portfolio =
     ,2773744908
     ,2772897849
     ,2773739848
-    ,3383969460
     ]
 
 jrd_untitled :: [Integer]
