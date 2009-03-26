@@ -120,18 +120,18 @@ write_picture_set s ns =
 
 gen_files :: IO ()
 gen_files =
-    do is <- write_picture_set "portfolio" jrd_portfolio
-       write_front (is !! 2)
+    do fi <- read_database 3383211501
+       write_front fi
        write_picture_set "something like a sunset (2005)" jrd_sunset_2005
        write_picture_set "project 2008" jrd_project_2008
        write_picture_set "untitled" jrd_untitled
        mk_textual "contact" jrd_contact
        mk_textual "bio" jrd_bio
-       let (ut:_) = jrd_untitled
+       let {-(ut:_) = jrd_untitled-}
            (p8:_) = jrd_project_2008
            (p5:_) = jrd_sunset_2005
-       mk_projects [("untitled", ut)
-                   ,("project 2008", p8)
+       mk_projects [{-("untitled", ut)
+                   ,-}("more photographs about contact (2008)", p8)
                    ,("something like a sunset (2005)", p5)]
 
 -- * jrd content
@@ -183,6 +183,7 @@ jrd_portfolio =
     ,2773744908
     ,2772897849
     ,2773739848
+    ,3383969460
     ]
 
 jrd_untitled :: [Integer]
@@ -195,34 +196,34 @@ jrd_project_2008 :: [Integer]
 jrd_project_2008 =
     [2975815597
     ,2975930133
-    ,2975678167
-    ,2975830543
-    ,2976523800
-    ,2976807306
-    ,2975943979
+    --,2975678167
+    --,2975830543
+    --,2976523800
+    --,2976807306
+    --,2975943979
     ,2976795876
-    ,2976515682
-    ,2975591811
-    ,2975667623
+    --,2976515682
+    --,2975591811
+    --,2975667623
     ,2975588827
-    ,2976781918
+    --,2976781918
     ,2975938457
     ,2975673763
-    ,2975820397
-    ,2975959797
+    --,2975820397
+    --,2975959797
     ,2975842115
     ,2976690996
-    ,2976518168
-    ,2976800824
-    ,2975812395
-    ,2975955159
+    --,2976518168
+    --,2976800824
+    --,2975812395
+    --,2975955159
     ,3049866394
     ,3049878472
-    ,3049034093
-    ,3049031351
+    --,3049034093
+    --,3049031351
     ,3049038105
-    ,3049866402
-    ,3058977920
+    --,3049866402
+    --,3058977920
     ]
 
 jrd_sunset_2005 :: [Integer]
