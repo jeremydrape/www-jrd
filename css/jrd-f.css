@@ -42,11 +42,12 @@ div.photo {
 
 div.index {
  text-align: center;
- color: #000;
+ color: #ddd;
 }
 
 div.index a {
  text-decoration: none;
+ color: #ddd;
 }
 
 span.area {
