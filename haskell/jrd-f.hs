@@ -122,6 +122,7 @@ gen_files :: IO ()
 gen_files =
     do fi <- read_database 3383211501
        write_front fi
+       write_picture_set "portfolio" jrd_portfolio
        write_picture_set "something like a sunset (2005)" jrd_sunset_2005
        write_picture_set "project 2008" jrd_project_2008
        write_picture_set "untitled" jrd_untitled
