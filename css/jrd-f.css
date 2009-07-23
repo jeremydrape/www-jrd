@@ -1,5 +1,5 @@
 body {
- font-size: 75%;
+ font-size: 85%;
  font-family: courier, monospace;
 }
 
@@ -31,14 +31,20 @@ div.menu {
  margin-left: 5px;
  padding-bottom: 15px;
  margin-bottom: 15px;
-} 
+}
 
 div.photo {
  height: 500px;
  text-align: center;
+ padding-bottom: 5px;
+ margin-bottom: 5px;
+}
+
+div.photo-title {
+ text-align: center;
  padding-bottom: 15px;
  margin-bottom: 15px;
-} 
+}
 
 div.index {
  text-align: center;

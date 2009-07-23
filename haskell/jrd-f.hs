@@ -14,7 +14,8 @@ mk_div p n =
     let i = H.img [H.src (mk_uri Nothing p)
                   ,H.alt (title p)]
         f m = H.a [H.href (up 1 </> m)] [i]
-    in cdiv "photo" [maybe i f n]
+    in H.div [] [cdiv "photo" [maybe i f n]
+                ,cdiv "photo-title" [H.cdata (title p)]]
 
 std_html_attr :: [X.Attr]
 std_html_attr =
@@ -38,15 +39,16 @@ mk_page top t e =
        ,H.lang "en"]
        [H.head [] (std_meta t (top </> "css" </> "jrd-f.css")), H.body [] e])
 
-mk_index :: String -> FilePath -> [(Image, Integer)] -> Image -> X.Content
+type PICTURE = (Image, Integer)
+
+mk_index :: String -> FilePath -> [PICTURE] -> Image -> X.Content
 mk_index s top is _c =
-    let f (i,n) = g (i,n) -- if i == c then H.cdata (show n) else (g (i,n))
-        g (i,n) = H.a
+    let g (i,n) = H.a
                   [H.href (top </> "f" </> identifier i)]
                   [H.cdata (show n)
                   ,H.nbsp]
         h = H.span [H.class' "area"] [H.cdata (s ++ ": ")]
-    in cdiv "index" (h : intersperse (H.cdata " ") (map f is))
+    in cdiv "index" (h : intersperse (H.cdata " ") (map g is))
 
 up :: Int -> FilePath
 up 0 = "."
@@ -58,7 +60,7 @@ find_next (i:j:xs) k | i == k = Just (identifier j)
                      | otherwise = find_next (j:xs) k
 find_next _ _ = Nothing
 
-write_page :: String -> [(Image, Integer)] -> Image -> IO ()
+write_page :: String -> [PICTURE] -> Image -> IO ()
 write_page s is i =
     do let idx = mk_index s (up 2) is i
            d = up 1 </> "f" </> identifier i
@@ -90,159 +92,89 @@ mk_textual t ls = do
       p = mk_page (up 2) t [jrd_menu (up 2), H.div [H.class' "text"] c]
   writeFile (d </> "index.html") p
 
-mk_projects :: [(String, Integer)] -> IO ()
-mk_projects ls = do
-  let top = up 2
-      t = "projects"
-      d = up 1 </> "f" </> t
-  createDirectoryIfMissing True d
-  let e = replicate 4 (H.br [])
-      f (s, i) = H.div 
-                  [] 
-                  (H.a
-                   [H.href (top </> "f" </> show i)] 
-                   [H.cdata s] : replicate 4 (H.br []))
-      c = e ++ map f ls
-      p = mk_page top  t [jrd_menu (up 2), H.div [H.class' "text"] c]
-  writeFile (d </> "index.html") p
-
 read_database :: Integer -> IO Image
 read_database n =
     do s <- readFile (up 1 </> "f" </> "db" </> show n)
        return (read s)
 
-write_picture_set :: String -> [Integer] -> IO [Image]
+write_picture_set :: String -> [(Integer, String)] -> IO [Image]
 write_picture_set s ns =
-    do is <- mapM read_database ns
-       let js = zip is [1..]
-       mapM_ (write_page s js) is
-       return is
+    do is <- mapM read_database (map fst ns)
+       let retitle i t = i { title = t }
+           is' = zipWith retitle is (map snd ns)
+       let js = zip is' [1..]
+       mapM_ (write_page s js) is'
+       return is'
 
 gen_files :: IO ()
 gen_files =
     do fi <- read_database 3383211501
        write_front fi
        write_picture_set "portfolio" jrd_portfolio
-       write_picture_set "something like a sunset (2005)" jrd_sunset_2005
-       write_picture_set "project 2008" jrd_project_2008
-       write_picture_set "untitled" jrd_untitled
+       write_picture_set "works" jrd_works
        mk_textual "contact" jrd_contact
        mk_textual "bio" jrd_bio
-       let {-(ut:_) = jrd_untitled-}
-           (p8:_) = jrd_project_2008
-           (p5:_) = jrd_sunset_2005
-       mk_projects [{-("untitled", ut)
-                   ,-}("more photographs about contact (2008)", p8)
-                   ,("something like a sunset (2005)", p5)]
 
 -- * jrd content
 
 jrd_menu :: FilePath -> X.Content
 jrd_menu top = cdiv
        "menu"
-       [cdiv 
-        "jrd" 
-        [H.a [H.href "http://jeremydrape.com"] [H.cdata "jeremy drape"]
-        ,H.cdata " / photography"]
-       ,cdiv 
+       [cdiv
         "lks"
         (intersperse
          (H.cdata ", ")
          [H.a
-          [H.href (top </> "f" </> show (head jrd_portfolio))]
-          [H.cdata "portfolio"]
+          [H.href "http://jeremydrape.com"]
+          [H.cdata "Jeremy Drape"]
+        ,H.a
+          [H.href (top </> "f" </> show (fst (head jrd_portfolio)))]
+          [H.cdata "Portfolio"]
          ,H.a
-          [H.href (top </> "f" </> "projects")]
-          [H.cdata "projects"]
+          [H.href (top </> "f" </> show (fst (head jrd_works)))]
+          [H.cdata "Works"]
          ,H.a
-          [H.href "http://horsehunting.blogspot.com/"
+          [H.href "http://jeremydrape.blogspot.com/"
           ,H.target "_blank"]
-          [H.cdata "blog"]
+          [H.cdata "The Index"]
          ,H.a
           [H.href (top </> "f" </> "bio")]
-          [H.cdata "bio"]
+          [H.cdata "About"]
          ,H.a
           [H.href (top </> "f" </> "contact")]
-          [H.cdata "contact"]])]
+          [H.cdata "Contact"]])]
 
-jrd_portfolio :: [Integer]
+jrd_portfolio :: [(Integer, String)]
 jrd_portfolio =
-    [3383969460
-    ,2773687772
-    ,2752508645
-    ,2772814665
-    ,2752510459
-    ,2888690149
-    ,2888689563
-    ,2888688277
-    ,2888647043
-    ,2752613797
-    ,2752505961
-    ,2773734560
-    ,2753341584
-    ,2773617644
-    ,2772917061
-    ,2773744908
-    ,2772897849
-    ,2773739848
+    [(3730845371, "michelle")
+    ,(3637844930, "lou")
+    ,(2888690149, "sanja")
+    ,(3731646402, "jean-yve (sitting)")
+    ,(3731649382, "salote")
+    ,(2752505961, "emily (car)")
+    ,(2773687772, "utako")
+    ,(2888688277, "sanja (flash)")
+    ,(2752613797, "emily")
+    ,(3383211501, "jean-yve")
+    ,(2752511921, "utako (eyes closed)")
+    ,(2889523886, "chair")
     ]
 
-jrd_untitled :: [Integer]
-jrd_untitled =
-    [3052207207
-    ,3052910758
-    ]
-
-jrd_project_2008 :: [Integer]
-jrd_project_2008 =
-    [2975815597
-    ,2975930133
-    --,2975678167
-    --,2975830543
-    --,2976523800
-    --,2976807306
-    --,2975943979
-    ,2976795876
-    --,2976515682
-    --,2975591811
-    --,2975667623
-    ,2975588827
-    --,2976781918
-    ,2975938457
-    ,2975673763
-    --,2975820397
-    --,2975959797
-    ,2975842115
-    ,2976690996
-    --,2976518168
-    --,2976800824
-    --,2975812395
-    --,2975955159
-    ,3049866394
-    ,3049878472
-    --,3049034093
-    --,3049031351
-    ,3049038105
-    --,3049866402
-    --,3058977920
-    ]
-
-jrd_sunset_2005 :: [Integer]
-jrd_sunset_2005 =
-    [2816331143
-    ,2977077704
-    ,2976226133
-    ,2816330797
-    ,2816331047
-    ,2977074038
-    ,2976228917
-    ,2975921867
-    ,2976779054
-    ,2977086406
-    ,2816339243
-    ,2977086004
-    ,2975957499
-    ,2817190002
+jrd_works :: [(Integer, String)]
+jrd_works =
+    [(2649888018, "The Peak, 2005")
+    ,(2977077704, "Child Looking, 2005")
+    ,(2649054539, "The Ferry, 2005")
+    ,(2977074038, "The Island, 2005")
+    ,(2975921867, "Metro, 2005")
+    ,(2816339243, "The Ladder, 2005")
+    ,(2817190002, "Doorway, 2005")
+    ,(2977147184, "Walking Man, 2007")
+    ,(2650059364, "Untitled, 2007")
+    ,(2975930133, "Tyres, 2008")
+    ,(2976690996, "Sophie (nude), 2008")
+    ,(3049866394, "Sophie (diptych), 2008")
+    ,(3049038105, "Red Stripe, 2008")
     ]
 
 jrd_contact :: [(String,[String])]
@@ -259,18 +191,5 @@ jrd_contact =
 
 jrd_bio :: [(String,[String])]
 jrd_bio =
-    [("Education"
-     ,["Bachelor of Fine Art (Honours)"
-      ,"Major - Photography"
-      ,"2000 - 2004"
-      ,"Victorian College of The Arts"])
-    ,("Awards"
-     ,["2003 - Dr David Rosenthal Award, VCA"
-      ,"2001 - Theodor Urbach Award, VCA"])
-    ,("Selected Group Exhibitions"
-     ,["2007 - Polar - Margaret Lawrence Gallery"
-      ,"2007 - Always On My Mind - TCB Gallery"
-      ,"2004 - The Graduate Show - Margaret Lawrence Gallery"
-      ,"2004 - VCA Photography Graduates - Span Galleries"
-      ,"2003 - The Graduate Show - Margaret Lawrence Gallery"
-      ,"2003 - Art of Protest - Bmw Edge Federation Square"])]
+    [(""
+     ,["Jeremy Drape is a Melbourne based photographer who graduated from the Victorian College of the Arts in 2004."])]
