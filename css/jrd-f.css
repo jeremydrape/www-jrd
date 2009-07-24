@@ -18,8 +18,16 @@ h2 {
 }
 
 a, a:link, a:visited, a:active, a:hover {
- text-decoration: underline;
+ text-decoration: none;
  color: #333;
+}
+
+a.underlined {
+ text-decoration: underline;
+}
+
+span.separator {
+ width: 5em;
 }
 
 /* f/n */
@@ -53,7 +61,7 @@ div.index {
 
 div.index a {
  text-decoration: none;
- color: #ddd;
+ color: #777;
 }
 
 span.area {

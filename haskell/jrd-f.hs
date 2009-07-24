@@ -41,14 +41,13 @@ mk_page top t e =
 
 type PICTURE = (Image, Integer)
 
-mk_index :: String -> FilePath -> [PICTURE] -> Image -> X.Content
-mk_index s top is _c =
+mk_index :: FilePath -> [PICTURE] -> Image -> X.Content
+mk_index top is _c =
     let g (i,n) = H.a
                   [H.href (top </> "f" </> identifier i)]
                   [H.cdata (show n)
                   ,H.nbsp]
-        h = H.span [H.class' "area"] [H.cdata (s ++ ": ")]
-    in cdiv "index" (h : intersperse (H.cdata " ") (map g is))
+    in cdiv "index" (intersperse (H.cdata " ") (map g is))
 
 up :: Int -> FilePath
 up 0 = "."
@@ -60,9 +59,9 @@ find_next (i:j:xs) k | i == k = Just (identifier j)
                      | otherwise = find_next (j:xs) k
 find_next _ _ = Nothing
 
-write_page :: String -> [PICTURE] -> Image -> IO ()
-write_page s is i =
-    do let idx = mk_index s (up 2) is i
+write_page :: [PICTURE] -> Image -> IO ()
+write_page is i =
+    do let idx = mk_index (up 2) is i
            d = up 1 </> "f" </> identifier i
            t = "jrd/f/" ++ identifier i
            pg = mk_page (up 2) t [ jrd_menu (up 2)
@@ -97,21 +96,21 @@ read_database n =
     do s <- readFile (up 1 </> "f" </> "db" </> show n)
        return (read s)
 
-write_picture_set :: String -> [(Integer, String)] -> IO [Image]
-write_picture_set s ns =
+write_picture_set :: Bool -> [(Integer, String)] -> IO [Image]
+write_picture_set rt ns =
     do is <- mapM read_database (map fst ns)
        let retitle i t = i { title = t }
-           is' = zipWith retitle is (map snd ns)
+           is' = if rt then zipWith retitle is (map snd ns) else is
        let js = zip is' [1..]
-       mapM_ (write_page s js) is'
+       mapM_ (write_page js) is'
        return is'
 
 gen_files :: IO ()
 gen_files =
     do fi <- read_database 3383211501
        write_front fi
-       write_picture_set "portfolio" jrd_portfolio
-       write_picture_set "works" jrd_works
+       write_picture_set False jrd_portfolio
+       write_picture_set True jrd_works
        mk_textual "contact" jrd_contact
        mk_textual "bio" jrd_bio
 
@@ -123,9 +122,9 @@ jrd_menu top = cdiv
        [cdiv
         "lks"
         (intersperse
-         (H.cdata ", ")
+         (H.span [H.class' "separator"] [H.nbsp, H.nbsp, H.nbsp])
          [H.a
-          [H.href "http://jeremydrape.com"]
+          [H.class' "underlined", H.href "http://jeremydrape.com"]
           [H.cdata "Jeremy Drape"]
         ,H.a
           [H.href (top </> "f" </> show (fst (head jrd_portfolio)))]
@@ -137,9 +136,6 @@ jrd_menu top = cdiv
           [H.href "http://jeremydrape.blogspot.com/"
           ,H.target "_blank"]
           [H.cdata "The Index"]
-         ,H.a
-          [H.href (top </> "f" </> "bio")]
-          [H.cdata "About"]
          ,H.a
           [H.href (top </> "f" </> "contact")]
           [H.cdata "Contact"]])]
