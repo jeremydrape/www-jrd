@@ -1,0 +1,73 @@
+/**
+* CSS
+* 
+* @version 1.0
+* @author Vaska 
+* @author Gregory Cadar
+*/
+* {
+ margin: 0;
+ padding: 0;
+}
+
+body {
+ font-size: 10px;
+ color: #000000;
+ font-family: Georgia, serif;
+ background: #fff;
+}
+
+body.section-1 { }
+body.section-2 { }
+body.section-3 { }
+
+a:link { text-decoration: none; color: #000000; }
+a:active { text-decoration: none; color: #000000; }
+a:visited { text-decoration: none; color: #000000; }
+a:hover { text-decoration: none; color: #000000; }
+
+a img { border: none; }
+
+#menu {
+ background-color: #fff;
+ bottom: 0;
+ height: 100%;
+ left: 0;
+ /*overflow: auto;*/
+ position: absolute;
+ top: 0;
+ width: 275px;
+}
+
+#menu ul {
+ list-style: none;
+ margin: 0 0 12px 0;
+}
+
+#menu ul li.section-title { }
+
+#content {
+ height: 100%;
+ margin: 0 0 0 275px;
+ top: 0;
+}
+
+.container {
+ padding: 15px 5px 15px 15px;
+}
+
+#content p { width: 600px; margin-bottom: 9px; }
+
+p {
+ margin: 0 0 9px 0;
+}
+
+h1 { font-size: 32px; }
+h2 { font-size: 24px; }
+h3 { font-size: 16px; }
+h4 { font-size: 12px; }
+
+#img-container { margin: 0; padding: 0; }
+#img-container p { width: 600px; margin: 0; padding: 0 0 12px 0; }
+
+#once { clear: left; }
