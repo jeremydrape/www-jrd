@@ -8,4 +8,4 @@ a:
 	ghc -Wall jrd-a.hs -e main
 
 clean:
-	rm -R ../f
+	rm -fR ../f
