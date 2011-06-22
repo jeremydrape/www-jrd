@@ -2,7 +2,7 @@ module Flickr where
 
 import Data.List
 import Data.Maybe
-import Text.HTML.Download
+import qualified Network.HTTP as N
 import qualified Text.XML.Light as X
 
 data Image = Image { identifier :: String
@@ -28,6 +28,7 @@ delete_http_headers = snd . http_response_parts
 
 run_query :: String -> IO (Maybe X.Element)
 run_query u = do
+  let openURL url = N.getResponseBody =<< N.simpleHTTP (N.getRequest url)
   s <- openURL u
   let xs = delete_http_headers (lines s)
   return (X.parseXMLDoc (concat xs))

@@ -1,5 +1,4 @@
 import Data.List
-import Data.Maybe
 import Flickr
 import System.Directory
 import System.FilePath
@@ -50,9 +49,11 @@ mk_index top is _c =
     in cdiv "index" (intersperse (H.cdata " ") (map g is))
 
 up :: Int -> FilePath
-up 0 = "."
-up 1 = ".."
-up n = ".." </> up (n - 1)
+up n =
+    case n of
+      0 -> "."
+      1 -> ".."
+      _ -> ".." </> up (n - 1)
 
 find_next :: [Image] -> Image -> Maybe String
 find_next (i:j:xs) k | i == k = Just (identifier j)
@@ -60,23 +61,23 @@ find_next (i:j:xs) k | i == k = Just (identifier j)
 find_next _ _ = Nothing
 
 write_page :: [PICTURE] -> Image -> IO ()
-write_page is i =
-    do let idx = mk_index (up 2) is i
-           d = up 1 </> "f" </> identifier i
-           t = "jrd/f/" ++ identifier i
-           pg = mk_page (up 2) t [ jrd_menu (up 2)
-                                 , mk_div i (find_next (map fst is) i)
-                                 , idx ]
-       createDirectoryIfMissing True d
-       writeFile (d </> "index.html") pg
+write_page is i = do
+  let idx = mk_index (up 2) is i
+      d = up 1 </> "f" </> identifier i
+      t = "jrd/f/" ++ identifier i
+      pg = mk_page (up 2) t [ jrd_menu (up 2)
+                            , mk_div i (find_next (map fst is) i)
+                            , idx ]
+  createDirectoryIfMissing True d
+  writeFile (d </> "index.html") pg
 
 write_front :: Image -> IO ()
-write_front i =
-    do let d = up 1 </> "f"
-           t = "jeremy drape / photographer"
-           pg = mk_page (up 1) t [jrd_menu (up 1), mk_div i Nothing]
-       createDirectoryIfMissing True d
-       writeFile (d </> "index.html") pg
+write_front i = do
+  let d = up 1 </> "f"
+      t = "jeremy drape / photographer"
+      pg = mk_page (up 1) t [jrd_menu (up 1), mk_div i Nothing]
+  createDirectoryIfMissing True d
+  writeFile (d </> "index.html") pg
 
 mk_section :: (String,[String]) -> X.Content
 mk_section (t,ls) = H.div [] [H.h2 [] [H.cdata t]
@@ -92,27 +93,27 @@ mk_textual t ls = do
   writeFile (d </> "index.html") p
 
 read_database :: Integer -> IO Image
-read_database n =
-    do s <- readFile (up 1 </> "f" </> "db" </> show n)
-       return (read s)
+read_database n = do
+  s <- readFile (up 1 </> "f" </> "db" </> show n)
+  return (read s)
 
 write_picture_set :: Bool -> [(Integer, String)] -> IO [Image]
-write_picture_set rt ns =
-    do is <- mapM read_database (map fst ns)
-       let retitle i t = i { title = t }
-           is' = if rt then zipWith retitle is (map snd ns) else is
-       let js = zip is' [1..]
-       mapM_ (write_page js) is'
-       return is'
+write_picture_set rt ns = do
+  is <- mapM read_database (map fst ns)
+  let retitle i t = i { title = t }
+      is' = if rt then zipWith retitle is (map snd ns) else is
+      js = zip is' [1..]
+  mapM_ (write_page js) is'
+  return is'
 
 gen_files :: IO ()
-gen_files =
-    do fi <- read_database 3383211501
-       write_front fi
-       write_picture_set False jrd_portfolio
-       write_picture_set True jrd_works
-       mk_textual "contact" jrd_contact
-       mk_textual "bio" jrd_bio
+gen_files = do
+  fi <- read_database 3383211501
+  write_front fi
+  _ <- write_picture_set False jrd_portfolio
+  _ <- write_picture_set True jrd_works
+  mk_textual "contact" jrd_contact
+  mk_textual "bio" jrd_bio
 
 -- * jrd content
 

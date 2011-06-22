@@ -1,5 +1,4 @@
 import Data.List
-import Data.Maybe
 import Flickr
 import System.Directory
 import System.FilePath
