@@ -89,8 +89,8 @@
         (w/class "box")
         (div
          (w/class "header")
-         (p 
-          (w/class "name") 
+         (p
+          (w/class "name")
           (a (attr (href top))
              "JEREMY DRAPE")))
         (div
@@ -107,7 +107,7 @@
   (mk-text-page
    "contact"
    "../"
-   (p 
+   (p
     (w/class "contact")
     "JEREMY DRAPE<br/>"
     "EMAIL:JEREMY@JEREMYDRAPE.COM<br/>"
@@ -178,16 +178,16 @@
             (div
              noattr
              (mk-left-menu top)
-             (p 
+             (p
               (w/class "stepper")
-              (a 
-               (attr (title "back") 
-                     (href bck)) 
+              (a
+               (attr (title "back")
+                     (href bck))
                "&larr;")
               "&nbsp;"
-              (a 
-               (attr (title "forward") 
-                     (href fwd)) 
+              (a
+               (attr (title "forward")
+                     (href fwd))
                "&rarr;")))))
       (html
        std-html-attr

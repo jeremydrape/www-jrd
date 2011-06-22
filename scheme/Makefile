@@ -2,7 +2,7 @@ ikarus:
 	make clean
 	ikarus jrd.scm
 
-clean: 
+clean:
 	rm -fR ../o/index.html \
 		../o/about \
 		../o/contact \
