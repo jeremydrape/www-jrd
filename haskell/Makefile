@@ -1,4 +1,5 @@
 f:
+	mkdir -p ../f/db
 	ghc -Wall jrd-f.hs -e gen_files
 
 r:

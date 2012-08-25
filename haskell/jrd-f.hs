@@ -1,5 +1,5 @@
 import Data.List
-import Flickr
+import qualified Flickr as F
 import System.Directory
 import System.FilePath
 import qualified Text.HTML.Light as H
@@ -8,13 +8,13 @@ import qualified Text.XML.Light as X
 cdiv :: String -> [X.Content] -> X.Content
 cdiv c = H.div [H.class' c]
 
-mk_div :: Image -> Maybe String -> X.Content
+mk_div :: F.Image -> Maybe String -> X.Content
 mk_div p n =
-    let i = H.img [H.src (mk_uri Nothing p)
-                  ,H.alt (title p)]
+    let i = H.img [H.src (F.mk_uri Nothing p)
+                  ,H.alt (F.title p)]
         f m = H.a [H.href (up 1 </> m)] [i]
     in H.div [] [cdiv "photo" [maybe i f n]
-                ,cdiv "photo-title" [H.cdata (title p)]]
+                ,cdiv "photo-title" [H.cdata (F.title p)]]
 
 std_html_attr :: [X.Attr]
 std_html_attr =
@@ -30,20 +30,17 @@ std_meta d s =
 
 mk_page :: FilePath -> String -> [X.Content] -> String
 mk_page top t e =
-    H.renderXHTML
-     H.xhtml_1_0_strict
+    H.renderHTML5
       (H.html
-       [H.xmlns "http://www.w3.org/1999/xhtml"
-       ,H.xml_lang "en"
-       ,H.lang "en"]
+       [H.lang "en"]
        [H.head [] (std_meta t (top </> "css" </> "jrd-f.css")), H.body [] e])
 
-type PICTURE = (Image, Integer)
+type PICTURE = (F.Image, Integer)
 
-mk_index :: FilePath -> [PICTURE] -> Image -> X.Content
+mk_index :: FilePath -> [PICTURE] -> F.Image -> X.Content
 mk_index top is _c =
     let g (i,n) = H.a
-                  [H.href (top </> "f" </> identifier i)]
+                  [H.href (top </> "f" </> F.identifier i)]
                   [H.cdata (show n)
                   ,H.nbsp]
     in cdiv "index" (intersperse (H.cdata " ") (map g is))
@@ -55,23 +52,23 @@ up n =
       1 -> ".."
       _ -> ".." </> up (n - 1)
 
-find_next :: [Image] -> Image -> Maybe String
-find_next (i:j:xs) k | i == k = Just (identifier j)
+find_next :: [F.Image] -> F.Image -> Maybe String
+find_next (i:j:xs) k | i == k = Just (F.identifier j)
                      | otherwise = find_next (j:xs) k
 find_next _ _ = Nothing
 
-write_page :: [PICTURE] -> Image -> IO ()
+write_page :: [PICTURE] -> F.Image -> IO ()
 write_page is i = do
   let idx = mk_index (up 2) is i
-      d = up 1 </> "f" </> identifier i
-      t = "jrd/f/" ++ identifier i
+      d = up 1 </> "f" </> F.identifier i
+      t = "jrd/f/" ++ F.identifier i
       pg = mk_page (up 2) t [ jrd_menu (up 2)
                             , mk_div i (find_next (map fst is) i)
                             , idx ]
   createDirectoryIfMissing True d
   writeFile (d </> "index.html") pg
 
-write_front :: Image -> IO ()
+write_front :: F.Image -> IO ()
 write_front i = do
   let d = up 1 </> "f"
       t = "jeremy drape / photographer"
@@ -92,15 +89,15 @@ mk_textual t ls = do
       p = mk_page (up 2) t [jrd_menu (up 2), H.div [H.class' "text"] c]
   writeFile (d </> "index.html") p
 
-read_database :: Integer -> IO Image
+read_database :: Integer -> IO F.Image
 read_database n = do
   s <- readFile (up 1 </> "f" </> "db" </> show n)
   return (read s)
 
-write_picture_set :: Bool -> [(Integer, String)] -> IO [Image]
+write_picture_set :: Bool -> [(Integer, String)] -> IO [F.Image]
 write_picture_set rt ns = do
   is <- mapM read_database (map fst ns)
-  let retitle i t = i { title = t }
+  let retitle i t = i { F.title = t }
       is' = if rt then zipWith retitle is (map snd ns) else is
       js = zip is' [1..]
   mapM_ (write_page js) is'

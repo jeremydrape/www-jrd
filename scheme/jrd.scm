@@ -17,9 +17,7 @@
             (make-link "stylesheet" s "text/css")))))
 
 (define std-html-attr
-  (attr (xmlns "http://www.w3.org/1999/xhtml")
-        (xml:lang "en")
-        (lang "en")))
+  (attr (lang "en")))
 
 (define jd-site
   "http://www.jeremydrape.com/")
@@ -207,21 +205,9 @@
              (div (w/class "footer") std-copyright)))))))
 
 (define write-file
-  (lambda (tree dir)
+  (lambda (e dir)
     (make-directory dir)
-    (with-output-to-file
-        (string-append dir "/index.html")
-      (lambda ()
-        (for-each
-         display
-         (flatten
-          (list (?xml "1.0" "UTF-8")
-                (!doctype
-                 "html"
-                 "PUBLIC"
-                 "-//W3C//DTD XHTML 1.0 Strict//EN"
-                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd")
-                tree)))))))
+    (render-html5 (string-append dir "/index.html") e)))
 
 (write-file front "../o")
 (write-file contact "../o/contact")
