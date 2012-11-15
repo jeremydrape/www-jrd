@@ -11,3 +11,6 @@ push-sp:
 
 remote-update:
 	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;darcs pull -a;make all)"
+
+pull-jrd:
+	darcs pull http://jeremydrape.com
