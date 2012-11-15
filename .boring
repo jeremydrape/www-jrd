@@ -1,7 +1,2 @@
-about$
-contact$
-./.*/index.html$
-./.*/.*/index.html$
-private$
-f$
-f/db$
+^index\.cgi$
+^private$

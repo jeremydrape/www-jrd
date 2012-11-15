@@ -9,12 +9,9 @@ directory structure:
 
 ------------------ ---------------------------------------
 css                css files
-f                  html files (GENERATED)
-f/db               flickr database files (GENERATED)
-haskell            haskell source code
-haskell/Flickr.hs  minimal flickr api bindings
-haskell/jrd-f.hs   code to generate site proper (f/)
-haskell/jrd-a.hs   code to generate archive list (f/a/)
+hs                 haskell code (current)
+hs/jrd-f           haskell code (obsolete)
+scm                scheme code (obsolete)
 ------------------ ---------------------------------------
 
 requirements:
