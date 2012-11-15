@@ -1,11 +1,9 @@
 module JRD where
 
---import Data.Char
 import System.FilePath {- filepath -}
 import qualified System.IO.Strict as I {- strict -}
 import qualified Text.HTML.Light as H {- html-minimalist -}
 import qualified Text.HTML.Light.Composite as H
---import qualified Text.HTML.Light.Composite.Menu as H
 import qualified Text.Pandoc as M {- pandoc -}
 import qualified Text.XML.Light as X {- xml -}
 
@@ -34,7 +32,7 @@ std_html_attr = [H.lang "en" ]
 
 std_meta :: String -> [X.Content]
 std_meta p =
-    [H.title [] [H.cdata p]
+    [H.title [] [H.cdata ("jeremydrape.com: " ++ p)]
     ,H.meta_author "jeremy drape"
     ,H.meta_description "jeremy drape is a canberra based photographer"
     ,H.meta_content_type "text/html; charset=UTF-8"
@@ -54,6 +52,6 @@ mk_img (md,_) i =
         menu = H.div [H.class' "menu"] [H.cdata_raw (md_html m)]
         image = let ln = [H.href (img_fn i),H.target i]
                 in H.div [H.class' "image"] [H.a ln [H.img [H.src (img_r_fn i)]]]
-        hd = H.head [] (std_meta "image")
+        hd = H.head [] (std_meta i)
         bd = H.body [H.class' "image"] [H.div [H.class' "main"] [menu, image]]
     in H.renderHTML5 (H.html std_html_attr [hd, bd])
