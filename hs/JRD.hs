@@ -38,6 +38,8 @@ std_meta p =
     ,H.meta_content_type "text/html; charset=UTF-8"
     ,H.link_css "all" "css/jrd.css"
     ,H.meta_viewport "width=device-width,initial-scale=1,user-scalable=yes"
+    ,H.meta [H.name "google-site-verification"
+            ,H.content "Ujn7EZ-8e4SlmGvR5e7YFAAyjt4VphkNCQTLZqkuqkg"]
     ]
 
 img_fn :: FilePath -> FilePath
