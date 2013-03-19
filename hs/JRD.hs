@@ -52,7 +52,7 @@ mk_img :: State -> String -> String
 mk_img (md,_) i =
     let Just m = lookup "menu" md
         menu = H.div [H.class' "menu"] [H.cdata_raw (md_html m)]
-        image = let ln = [H.href (img_fn i),H.target i]
+        image = let ln = [H.href ("?n=" ++ i)]
                 in H.div [H.class' "image"] [H.a ln [H.img [H.src (img_r_fn i)]]]
         hd = H.head [] (std_meta i)
         bd = H.body [H.class' "image"] [H.div [H.class' "main"] [menu, image]]
