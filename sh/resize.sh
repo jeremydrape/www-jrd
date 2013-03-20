@@ -1,18 +1,20 @@
 #!/bin/sh
 
-S=500
-D=h-$S
-T="x"$S
-
-for f in jpeg
+for s in 150 500
 do
-    for i in *.$f
+    d=h-$s
+    mkdir -p $d
+    t="x"$s
+    for f in jpeg
     do
-        n=$(basename $i .$f)
-        echo "resize: $n"
-        if test -f $D/$n.jpeg
-        then echo "$D/$n.jpeg exists"
-        else convert -resize $T -colorspace rgb $i $D/$n.jpeg
-        fi
+        for i in *.$f
+        do
+            n=$(basename $i .$f)
+            echo "resize: $n"
+            if test -f $d/$n.jpeg
+            then echo "$d/$n.jpeg exists"
+            else convert -resize $t -colorspace rgb $i $d/$n.jpeg
+            fi
+        done
     done
 done

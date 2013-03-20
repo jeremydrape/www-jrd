@@ -1,3 +1,3 @@
-^data/jpeg/h-500$
+^data/jpeg/h-.*$
 ^index\.cgi$
 ^private$

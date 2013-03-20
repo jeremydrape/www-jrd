@@ -45,17 +45,31 @@ std_meta p =
 img_fn :: FilePath -> FilePath
 img_fn nm = "data/jpeg" </> nm <.> "jpeg"
 
-img_r_fn :: FilePath -> FilePath
-img_r_fn nm = "data/jpeg/h-500" </> nm <.> "jpeg"
+img_r_fn :: Int -> FilePath -> FilePath
+img_r_fn sz nm = "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
+
+div_c :: String -> [X.Content] -> X.Content
+div_c c = H.div [H.class' c]
+
+mk_frame :: State -> String -> [X.Content] -> String
+mk_frame (md,_) mt cn =
+    let Just m = lookup "menu" md
+        menu = div_c "menu" [H.cdata_raw (md_html m)]
+        hd = H.head [] (std_meta mt)
+        bd = H.body [H.class' "image"] [div_c "main" (menu:cn)]
+    in H.renderHTML5 (H.html std_html_attr [hd,bd])
+
+mk_img_div :: Int -> String -> String -> X.Content
+mk_img_div sz cl i =
+    let ln = [H.href "."]
+        im = [H.img [H.src (img_r_fn sz i)]]
+    in div_c (unwords ["image",cl]) [H.a ln im]
 
 mk_img :: State -> String -> String
-mk_img (md,_) i =
-    let div_c c = H.div [H.class' c]
-        Just m = lookup "menu" md
-        menu = div_c "menu" [H.cdata_raw (md_html m)]
-        image = let ln = [H.href "."]
-                    im = [H.img [H.src (img_r_fn i)]]
-                in div_c "image" [H.a ln im]
-        hd = H.head [] (std_meta i)
-        bd = H.body [H.class' "image"] [div_c "main" [menu,image]]
-    in H.renderHTML5 (H.html std_html_attr [hd, bd])
+mk_img st mt = mk_frame st mt [mk_img_div 500 "std" mt]
+
+mk_ix :: State -> String
+mk_ix st =
+    let (_,is) = st
+        cn = map (mk_img_div 150 "ix") is
+    in mk_frame st "ix" cn
