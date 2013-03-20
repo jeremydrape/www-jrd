@@ -50,10 +50,12 @@ img_r_fn nm = "data/jpeg/h-500" </> nm <.> "jpeg"
 
 mk_img :: State -> String -> String
 mk_img (md,_) i =
-    let Just m = lookup "menu" md
-        menu = H.div [H.class' "menu"] [H.cdata_raw (md_html m)]
-        image = let ln = [H.href ("?n=" ++ i)]
-                in H.div [H.class' "image"] [H.a ln [H.img [H.src (img_r_fn i)]]]
+    let div_c c = H.div [H.class' c]
+        Just m = lookup "menu" md
+        menu = div_c "menu" [H.cdata_raw (md_html m)]
+        image = let ln = [H.href "."]
+                    im = [H.img [H.src (img_r_fn i)]]
+                in div_c "image" [H.a ln im]
         hd = H.head [] (std_meta i)
-        bd = H.body [H.class' "image"] [H.div [H.class' "main"] [menu, image]]
+        bd = H.body [H.class' "image"] [div_c "main" [menu,image]]
     in H.renderHTML5 (H.html std_html_attr [hd, bd])
