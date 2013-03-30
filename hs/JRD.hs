@@ -3,8 +3,8 @@ module JRD where
 import System.FilePath {- filepath -}
 import qualified System.IO.Strict as I {- strict -}
 import qualified Text.HTML.Light as H {- html-minimalist -}
-import qualified Text.HTML.Light.Composite as H
-import qualified Text.Pandoc as M {- pandoc -}
+import qualified Text.HTML.Light.Composite as H {- html-minimalist -}
+import qualified Text.Pandoc.Minus as M {- pandoc-minus -}
 import qualified Text.XML.Light as X {- xml -}
 
 type MD = [(String,String)]
