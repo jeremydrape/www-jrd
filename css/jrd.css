@@ -16,5 +16,7 @@ ul li {list-style-type: none}
 a,a:visited {color: black}
 code {font-family: "Courier New",monospace}
 
+/* class */
+div.title {color: #666}
 div.ix {display: inline}
 div.ix {padding-right: 1em}
