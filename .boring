@@ -1,3 +1,4 @@
 ^data/jpeg/h-.*$
 ^index\.cgi$
 ^private$
+^ij$
