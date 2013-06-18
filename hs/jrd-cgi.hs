@@ -34,6 +34,8 @@ dispatch st (m,p,q) = do
                              Just t -> W.utf8_html_output (mk_img st (i,t))
     ("GET",_,[("n",i)]) -> mk_front st (Just i)
     ("GET",_,[("m","ix")]) -> W.utf8_html_output (mk_ix st)
+    ("GET",_,[("m","upload")]) -> W.upload_get "data/jpeg" ".jpeg"
+    ("POST",_,[("m","upload")]) -> W.upload_post e_config
     ("GET",_,[]) -> mk_front st Nothing
     _ -> W.utf8_text_output "jrd: dispatch error"
 
