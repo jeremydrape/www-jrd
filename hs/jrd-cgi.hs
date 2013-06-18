@@ -8,9 +8,9 @@ import JRD
 
 e_config :: W.Config
 e_config =
-    W.Config {W.cfg_vcs = Just (W.Darcs
+    W.Config {W.cfg_vcs = Just (W.Git
                                ,("jeremy drape <jeremy.drape@gmail.com>"
-                                ,Nothing))
+                                ,Just "sp"))
              ,W.cfg_url = "http://jeremydrape.com"
              ,W.cfg_pwd = Nothing}
 

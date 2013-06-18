@@ -7,10 +7,14 @@ clean:
 	(cd data/jpeg; make clean)
 
 push-sp:
-	darcs push -a rd@slavepianos.org:ut/www-jrd
+	git push sp
+
+pull-sp:
+	git pull sp master
+
+add-remote-sp:
+	git remote remove sp
+	git remote add sp ssh://rd@slavepianos.org/~rd/ut/www-jrd.git
 
 remote-update:
-	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;darcs pull -a;make all)"
-
-pull-jrd:
-	darcs pull http://jeremydrape.com
+	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;make pull-sp;make all)"
