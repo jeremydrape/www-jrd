@@ -14,7 +14,6 @@
 ,("jeanseller","")
 ,("ladder","")
 ,("laith5","")
-,("Makefile","")
 ,("Man-With-Bike","")
 ,("Men-Rounding-Corner","")
 ,("MenwithTelevision","")
