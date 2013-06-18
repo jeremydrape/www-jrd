@@ -34,8 +34,8 @@ std_html_attr :: [X.Attr]
 std_html_attr = [H.lang "en" ]
 
 std_meta :: String -> [X.Content]
-std_meta p =
-    [H.title [] [H.cdata ("jeremydrape.com: " ++ p)]
+std_meta _ =
+    [H.title [] [H.cdata "jeremydrape.com"]
     ,H.meta_author "jeremy drape"
     ,H.meta_description "jeremy drape is a canberra based photographer"
     ,H.meta_content_type "text/html; charset=UTF-8"
