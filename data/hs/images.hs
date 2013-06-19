@@ -18,7 +18,7 @@
 ,("richard2","Richard in my Studio, 2010")
 ,("Rome","Metro Flowers (Rome), 2005")
 ,("stbathans","St Bathans, 2009")
-,("Theconcierge","The Conceirge (Kyoto), 2009")
+,("Theconcierge","The Concierge (Kyoto), 2009")
 ,("w57_sleepingdog","Sleeping Dog, 2010")
 ,("Woman-With-Glove-II-copy","Woman with Glove, 2009")
 ]
