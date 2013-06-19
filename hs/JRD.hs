@@ -2,6 +2,7 @@ module JRD where
 
 import System.FilePath {- filepath -}
 import qualified System.IO.Strict as I {- strict -}
+import System.Process {- process -}
 import qualified Text.HTML.Light as H {- html-minimalist -}
 import qualified Text.HTML.Light.Composite as H {- html-minimalist -}
 import qualified Text.Pandoc.Minus as M {- pandoc-minus -}
@@ -79,3 +80,8 @@ mk_ix st =
     let (_,is) = st
         cn = map (\(k,_) -> mk_img_div 150 "ix" (k,Nothing)) is
     in mk_frame st "ix" cn
+
+proc_resize :: IO ()
+proc_resize = do
+  _ <- rawSystem "sh" ["sh/resize.sh","data/jpeg"]
+  return ()

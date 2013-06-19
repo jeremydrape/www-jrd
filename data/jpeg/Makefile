@@ -1,6 +1,5 @@
 all:
-	mkdir -p h-500
-	sh ../../sh/resize.sh
+	sh ../../sh/resize.sh .
 
 clean:
-	rm -R h-500
+	rm -R h-150 h-500
