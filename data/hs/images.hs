@@ -9,7 +9,7 @@
 ,("blackstain-copy","")
 ,("boylooking","Boy Looking (Venice), 2005")
 ,("Breakdown","Breakdown, 2010")
-,("chloe7","")
+,("chloe7","Chloe Modelling, 2009")
 ,("F1000005-copy","")
 ,("jeanseller","Jean Seller, 2010")
 ,("ladder","")
