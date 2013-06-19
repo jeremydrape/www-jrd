@@ -13,7 +13,7 @@ pull-sp:
 	git pull sp master
 
 pull-sp-http:
-	git pull http://rd.slavepianos.org/ut/www-jrd.git/
+	git pull http://rd.slavepianos.org/ut/www-jrd.git/ master
 
 add-remote-sp:
 	git remote remove sp
