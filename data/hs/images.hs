@@ -23,5 +23,5 @@
 ,("stbathans","")
 ,("Theconcierge","")
 ,("w57_sleepingdog","")
-,("Woman-With-Glove-II-copy","")
+,("Woman-With-Glove-II-copy","Woman with Glove, 2009")
 ]
