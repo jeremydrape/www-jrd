@@ -1,7 +1,6 @@
 [("57_weight-2","The Weight of the World, 2011")
 ,("97870034","Sanja Pahoki in her studio, 2008")
 ,("img_4385","Screen #2, 2012")
-,("img_5066","untitled")
 ,("39870012","Temporary Shelter (Tokyo), 2009")
 ,("49290037","Man Looking out to Sea, 2010")
 ,("49300025","Man Resting (Istanbul), 2010")
