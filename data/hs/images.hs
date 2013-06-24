@@ -21,8 +21,8 @@
 ,("Theconcierge","The Concierge (Kyoto), 2009")
 ,("w57_sleepingdog","Sleeping Dog, 2010")
 ,("Woman-With-Glove-II-copy","Woman with Glove, 2009")
-,("Screen-1","")
-,("Split","")
-,("Splitscreen1","")
-,("legs","")
+,("Screen-1","Screen #1, 2011")
+,("Split","Split Screen #2, 2012")
+,("Splitscreen1","Split Screen #1, 2012")
+,("legs","Legs, 2011")
 ]
