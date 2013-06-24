@@ -21,3 +21,5 @@ do
         done
     done
 done
+
+exit 0

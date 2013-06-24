@@ -1,5 +1,6 @@
 module JRD where
 
+import Data.List
 import System.FilePath {- filepath -}
 import qualified System.IO.Strict as I {- strict -}
 import System.Process {- process -}
@@ -9,11 +10,17 @@ import qualified Text.Pandoc.Minus as M {- pandoc-minus -}
 import qualified Text.XML.Light as X {- xml -}
 
 type MD = [(String,String)]
-type Image_Set = [(String,String)]
+type Image_Name = String
+type Image_Title = String
+type Image = (Image_Name,Image_Title)
+type Image_Set = [Image]
 type State = (MD,Image_Set)
 
-img_title :: Image_Set -> String -> Maybe String
+img_title :: Image_Set -> Image_Name -> Maybe Image_Title
 img_title st k = lookup k st
+
+img_lookup :: Image_Set -> Image_Name -> Maybe Image
+img_lookup st k = find ((== k) . fst) st
 
 load_md :: FilePath -> [String] -> IO MD
 load_md dir ps = do
