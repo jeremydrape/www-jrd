@@ -4,7 +4,7 @@
 
 /* plain */
 html {}
-body {font-family: "Ariel",monospace}
+body {font-family: "Courier New",monospace}
 body {font-size: 9pt}
 body {line-height: 1.15em}
 body {max-width: 55em}
@@ -14,7 +14,7 @@ h1 {text-decoration: underline}
 ul {padding-left: 0}
 ul li {list-style-type: none}
 a,a:visited {color: black}
-code {font-family: "Ariel",monospace}
+code {font-family: "Courier New",monospace}
 
 /* class */
 div.title {color: #666}
