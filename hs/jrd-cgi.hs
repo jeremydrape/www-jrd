@@ -1,4 +1,3 @@
-import Control.Applicative {- base -}
 import qualified Control.Monad.Random as R {- MonadRandom -}
 import qualified Network.CGI as C {- cgi -}
 import qualified System.Random.Shuffle as R {- random-shuffle -}
