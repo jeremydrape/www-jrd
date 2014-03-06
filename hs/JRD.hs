@@ -1,6 +1,6 @@
 module JRD where
 
-import Data.List
+import Data.List {- base -}
 import System.FilePath {- filepath -}
 import qualified System.IO.Strict as I {- strict -}
 import System.Process {- process -}
