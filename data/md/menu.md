@@ -1,5 +1,5 @@
 # [JEREMY DRAPE](http://jeremydrape.com)
 
-- Tel: +61 (0)406 627 085
-- Enquiries: jeremy.drape@gmail.com
+- Tel: +44 7546 278296
+- Enquiries: contact@jeremydrape.com
 
