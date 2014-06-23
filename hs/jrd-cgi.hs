@@ -57,11 +57,12 @@ dispatch st (m,p,q) = do
         do r <- W.upload_post e_config
            C.liftIO proc_resize
            return r
+    ("GET",_,[("m",mt)]) -> W.utf8_html_output (mk_md st mt)
     ("GET",_,[]) -> mk_front_ss st
     _ -> W.utf8_text_output "jrd: dispatch error"
 
 main :: IO ()
 main = do
   images <- load_image_set "."
-  md <- load_md "." ["menu"]
+  md <- load_md "." ["menu","about"]
   W.run_cgi (md,images) dispatch

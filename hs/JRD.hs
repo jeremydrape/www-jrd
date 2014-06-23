@@ -22,6 +22,7 @@ img_title st k = lookup k st
 img_lookup :: Image_Set -> Image_Name -> Maybe Image
 img_lookup st k = find ((== k) . fst) st
 
+-- > md <- load_md "/home/rohan/ut/www-jrd/" ["menu","about"]
 load_md :: FilePath -> [String] -> IO MD
 load_md dir ps = do
   let f p = I.readFile (dir </> "data/md" </> p <.> "md")
@@ -109,9 +110,18 @@ menu_html md =
       _ -> div_c "menu" [H.cdata_raw "no menu?"]
 
 mk_frame :: State -> String -> [X.Content] -> String
-mk_frame (_,md) mt cn =
+mk_frame (md,_) mt cn =
     let hd = H.head [] (std_meta mt)
         bd = H.body [H.class' "image"] [div_c "main" (menu_html md :cn)]
+    in H.renderHTML5 (H.html std_html_attr [hd,bd])
+
+mk_md :: State -> String -> String
+mk_md (md,_) mt =
+    let c = case lookup mt md of
+              Just m -> div_c mt [H.cdata_raw (md_html m)]
+              _ -> div_c mt [H.cdata_raw ("mk-md: ?" ++ mt ++ show md)]
+        hd = H.head [] (std_meta mt)
+        bd = H.body [H.class' mt] [div_c "main" [c]]
     in H.renderHTML5 (H.html std_html_attr [hd,bd])
 
 mk_img_div :: Int -> String -> (String,Maybe String) -> X.Content
