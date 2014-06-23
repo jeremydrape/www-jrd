@@ -8,8 +8,8 @@
 ,("FilmNotes-354","Rolls, 2010")
 ,("87940024","Gerroa, 2014")
 ,("interior","Interior, Unknown")
-,("14","Jean, Unknown")
+,("14","Jean")
 ,("FilmNotes-359","Turkey, 2010")
-,("FilmNotes-90","Self, Japan")
+,("FilmNotes-90","Japan")
 ,("63020002", "Field")
 ]
