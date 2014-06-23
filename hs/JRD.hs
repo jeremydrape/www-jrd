@@ -33,6 +33,46 @@ load_image_set dir = do
   let fn = dir </> "data/hs/images.hs"
   fmap read (I.readFile fn)
 
+slideshow_pre :: MD -> [String]
+slideshow_pre md =
+    ["<hmtl>"
+    ,"<head>"
+    ,concatMap H.showHTML5 (std_meta "")
+    ,"<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js\"></script>"
+    ,"<script src=\"http://malsup.github.com/jquery.cycle2.js\"></script>"
+    ,"</head>"
+    ,"<body>"
+    ,H.showHTML5 (menu_html md)
+    ,"<div class=\"cycle-slideshow\""
+    ,"     data-cycle-fx=\"fadeout\""
+    ,"     data-cycle-timeout=\"8000\""
+    ,"     data-cycle-speed=\"50\""
+    ,"     data-cycle-next=\".next\""
+    ,"     data-cycle-manual-fx=\"fadeout\""
+    ,"     data-cycle-manual-speed=\"50\""
+    ,"     data-cycle-caption=\"#caption\""
+    ,"     data-cycle-caption-template=\"{{cycleTitle}}\""
+    ]
+
+slideshow_post :: [String]
+slideshow_post =
+    ["</div>"
+    ,"<div id=\"caption\"></div>"
+    ,"</body>"]
+
+-- > let d = "/home/rohan/ut/www-jrd/"
+-- > img <- load_image_set d
+-- > md <- load_md d ["menu"]
+-- > writeFile (d </> "ss.html") (gen_slideshow md img)
+gen_slideshow :: MD -> Image_Set -> String
+gen_slideshow md =
+    let f (k,nm) = H.img [H.class' "next"
+                         ,H.src ("data/jpeg/h-500" </> k <.> "jpeg")
+                         ,H.mk_attr "data-cycle-title" nm
+                         ,H.mk_attr "data-cycle-hash" k]
+        pkg s = unlines (concat [slideshow_pre md,s,slideshow_post])
+    in pkg . map (H.showHTML5 . f)
+
 md_html :: String -> String
 md_html s =
     let s' = M.readMarkdown M.defaultParserState (s ++ "\n")
@@ -62,12 +102,16 @@ img_r_fn sz nm = "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
 div_c :: String -> [X.Content] -> X.Content
 div_c c = H.div [H.class' c]
 
+menu_html :: MD -> X.Content
+menu_html md =
+    case lookup "menu" md of
+      Just m -> div_c "menu" [H.cdata_raw (md_html m)]
+      _ -> div_c "menu" [H.cdata_raw "no menu?"]
+
 mk_frame :: State -> String -> [X.Content] -> String
-mk_frame (md,_) mt cn =
-    let Just m = lookup "menu" md
-        menu = div_c "menu" [H.cdata_raw (md_html m)]
-        hd = H.head [] (std_meta mt)
-        bd = H.body [H.class' "image"] [div_c "main" (menu:cn)]
+mk_frame (_,md) mt cn =
+    let hd = H.head [] (std_meta mt)
+        bd = H.body [H.class' "image"] [div_c "main" (menu_html md :cn)]
     in H.renderHTML5 (H.html std_html_attr [hd,bd])
 
 mk_img_div :: Int -> String -> (String,Maybe String) -> X.Content

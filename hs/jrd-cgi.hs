@@ -38,6 +38,9 @@ mk_front st = do
   (nm,tt) <- choose_image st
   W.utf8_html_output (mk_img st (nm,tt))
 
+mk_front_ss :: State -> W.Result
+mk_front_ss (md,img) = W.utf8_html_output (gen_slideshow md img)
+
 dispatch :: State -> W.Parameters -> W.Result
 dispatch st (m,p,q) = do
   case (m,p,q) of
@@ -54,7 +57,7 @@ dispatch st (m,p,q) = do
         do r <- W.upload_post e_config
            C.liftIO proc_resize
            return r
-    ("GET",_,[]) -> mk_front st
+    ("GET",_,[]) -> mk_front_ss st
     _ -> W.utf8_text_output "jrd: dispatch error"
 
 main :: IO ()
