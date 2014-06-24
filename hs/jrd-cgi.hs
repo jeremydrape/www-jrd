@@ -21,7 +21,7 @@ scramble k = R.evalRandIO (R.shuffleM k)
 -- image and store remainder.  This is rather fragile...
 choose_image :: State -> C.CGI Image
 choose_image st = do
-  let (_,im) = st
+  let (_,_,im) = st
       k = length im
       scr = C.liftIO (scramble [0 .. k - 1])
   c <- C.getCookie "n"
@@ -39,14 +39,14 @@ mk_front st = do
   W.utf8_html_output (mk_img st (nm,tt))
 
 mk_front_ss :: State -> W.Result
-mk_front_ss (md,img) = W.utf8_html_output (gen_slideshow md img)
+mk_front_ss st = W.utf8_html_output (gen_slideshow st)
 
 dispatch :: State -> W.Parameters -> W.Result
 dispatch st (m,p,q) = do
   case (m,p,q) of
     ("GET",_,[("e",d)]) -> W.edit_get d
     ("POST",_,[("e",_)]) -> W.edit_post e_config ""
-    ("GET",_,[("i",i)]) -> case img_title (snd st) i of
+    ("GET",_,[("i",i)]) -> case img_title st i of
                              Nothing -> mk_front st
                              Just t -> W.utf8_html_output (mk_img st (i,t))
     ("GET",_,[("m","ix")]) -> W.utf8_html_output (mk_ix st)
@@ -63,6 +63,7 @@ dispatch st (m,p,q) = do
 
 main :: IO ()
 main = do
+  opt <- load_opt_set "."
   images <- load_image_set "."
   md <- load_md "." ["menu","about"]
-  W.run_cgi (md,images) dispatch
+  W.run_cgi (opt,md,images) dispatch

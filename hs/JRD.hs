@@ -1,6 +1,7 @@
 module JRD where
 
 import Data.List {- base -}
+import Data.Maybe {- base -}
 import System.FilePath {- filepath -}
 import qualified System.IO.Strict as I {- strict -}
 import System.Process {- process -}
@@ -14,13 +15,17 @@ type Image_Name = String
 type Image_Title = String
 type Image = (Image_Name,Image_Title)
 type Image_Set = [Image]
-type State = (MD,Image_Set)
+type Opt = [(String,String)]
+type State = (Opt,MD,Image_Set)
 
-img_title :: Image_Set -> Image_Name -> Maybe Image_Title
-img_title st k = lookup k st
+img_title :: State -> Image_Name -> Maybe Image_Title
+img_title (_,_,is) k = lookup k is
 
-img_lookup :: Image_Set -> Image_Name -> Maybe Image
-img_lookup st k = find ((== k) . fst) st
+img_lookup :: State -> Image_Name -> Maybe Image
+img_lookup (_,_,is) k = find ((== k) . fst) is
+
+opt_lookup :: State -> String -> String -> String
+opt_lookup (o,_,_) k def = fromMaybe def (lookup k o)
 
 -- > md <- load_md "/home/rohan/ut/www-jrd/" ["menu","about"]
 load_md :: FilePath -> [String] -> IO MD
@@ -34,8 +39,13 @@ load_image_set dir = do
   let fn = dir </> "data/hs/images.hs"
   fmap read (I.readFile fn)
 
-slideshow_pre :: MD -> [String]
-slideshow_pre md =
+load_opt_set :: FilePath -> IO Opt
+load_opt_set dir = do
+  let fn = dir </> "data/hs/opt.hs"
+  fmap read (I.readFile fn)
+
+slideshow_pre :: State -> [String]
+slideshow_pre st =
     ["<hmtl>"
     ,"<head>"
     ,concatMap H.showHTML5 (std_meta "")
@@ -43,10 +53,10 @@ slideshow_pre md =
     ,"<script src=\"http://malsup.github.com/jquery.cycle2.js\"></script>"
     ,"</head>"
     ,"<body>"
-    ,H.showHTML5 (menu_html md)
+    ,H.showHTML5 (menu_html st)
     ,"<div class=\"cycle-slideshow\""
     ,"     data-cycle-fx=\"fadeout\""
-    ,"     data-cycle-timeout=\"8000\""
+    ,"     data-cycle-timeout=\"" ++ opt_lookup st "timeout" "8000" ++ "\""
     ,"     data-cycle-speed=\"50\""
     ,"     data-cycle-next=\".next\""
     ,"     data-cycle-manual-fx=\"fadeout\""
@@ -58,21 +68,23 @@ slideshow_pre md =
 slideshow_post :: [String]
 slideshow_post =
     ["</div>"
-    ,"<div id=\"caption\"></div>"
+    ,"<div class=\"title\" id=\"caption\"></div>"
     ,"</body>"]
 
 -- > let d = "/home/rohan/ut/www-jrd/"
 -- > img <- load_image_set d
 -- > md <- load_md d ["menu"]
 -- > writeFile (d </> "ss.html") (gen_slideshow md img)
-gen_slideshow :: MD -> Image_Set -> String
-gen_slideshow md =
-    let f (k,nm) = H.img [H.class' "next"
+gen_slideshow :: State -> String
+gen_slideshow st =
+    let (_,_,is) = st
+        f (k,nm) = H.img [H.class' "next"
                          ,H.src ("data/jpeg/h-500" </> k <.> "jpeg")
                          ,H.mk_attr "data-cycle-title" nm
                          ,H.mk_attr "data-cycle-hash" k]
-        pkg s = unlines (concat [slideshow_pre md,s,slideshow_post])
-    in pkg . map (H.showHTML5 . f)
+        pkg s = unlines (concat [slideshow_pre st,s,slideshow_post])
+        gen = pkg . map (H.showHTML5 . f)
+    in gen is
 
 md_html :: String -> String
 md_html s =
@@ -103,20 +115,20 @@ img_r_fn sz nm = "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
 div_c :: String -> [X.Content] -> X.Content
 div_c c = H.div [H.class' c]
 
-menu_html :: MD -> X.Content
-menu_html md =
+menu_html :: State -> X.Content
+menu_html (_,md,_) =
     case lookup "menu" md of
       Just m -> div_c "menu" [H.cdata_raw (md_html m)]
       _ -> div_c "menu" [H.cdata_raw "no menu?"]
 
 mk_frame :: State -> String -> [X.Content] -> String
-mk_frame (md,_) mt cn =
+mk_frame st mt cn =
     let hd = H.head [] (std_meta mt)
-        bd = H.body [H.class' "image"] [div_c "main" (menu_html md :cn)]
+        bd = H.body [H.class' "image"] [div_c "main" (menu_html st :cn)]
     in H.renderHTML5 (H.html std_html_attr [hd,bd])
 
 mk_md :: State -> String -> String
-mk_md (md,_) mt =
+mk_md (_,md,_) mt =
     let c = case lookup mt md of
               Just m -> div_c mt [H.cdata_raw (md_html m)]
               _ -> div_c mt [H.cdata_raw ("mk-md: ?" ++ mt ++ show md)]
@@ -138,7 +150,7 @@ mk_img st (mt,nm) = mk_frame st mt [mk_img_div 500 "std" (mt,Just nm)]
 
 mk_ix :: State -> String
 mk_ix st =
-    let (_,is) = st
+    let (_,_,is) = st
         cn = map (\(k,_) -> mk_img_div 150 "ix" (k,Nothing)) is
     in mk_frame st "ix" cn
 
