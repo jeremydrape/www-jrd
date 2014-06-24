@@ -6,7 +6,6 @@
 ,("Model","Chloe Modelling, 2010")
 ,("richard2","Richard in Studio, 2010")
 ,("63050029","Soho dinner, 2014")
-,("FilmNotes-122%20copy","Woman with umbrella, 2009")
 ,("FilmNotes-354","Rolls, 2010")
 ,("87940024","Gerroa, 2014")
 ,("interior","Interior, Unknown")
