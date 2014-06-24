@@ -19,6 +19,6 @@ code {font-family: "Times",monospace}
 
 /* class */
 div.title {color: #ffffff}
-div.caption {color: #ffffff}
+div#caption {color: #ffffff}
 div.ix {display: inline}
 div.ix {padding-right: 1em}
