@@ -8,7 +8,6 @@
 ,("63050029","Soho dinner, 2014")
 ,("FilmNotes-122","Woman with Umbrella, 2009")
 ,("FilmNotes-354","Rolls, 2010")
-,("87940024","Gerroa, 2014")
 ,("interior","Interior, Unknown")
 ,("14","Jean")
 ,("FilmNotes-359","Turkey, 2010")
