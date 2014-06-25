@@ -78,10 +78,13 @@ slideshow_post =
 gen_slideshow :: State -> String
 gen_slideshow st =
     let (_,_,is) = st
-        f (k,nm) = H.img [H.class' "next"
-                         ,H.src ("data/jpeg/h-500" </> k <.> "jpeg")
-                         ,H.mk_attr "data-cycle-title" nm
-                         ,H.mk_attr "data-cycle-hash" k]
+        addr k = case opt_lookup st "image-url" "true" of
+                   "false" -> Nothing
+                   _ -> Just (H.mk_attr "data-cycle-hash" k)
+        f (k,nm) = H.img ([H.class' "next"
+                          ,H.src ("data/jpeg/h-500" </> k <.> "jpeg")
+                          ,H.mk_attr "data-cycle-title" nm] ++
+                          catMaybes [addr k])
         pkg s = unlines (concat [slideshow_pre st,s,slideshow_post])
         gen = pkg . map (H.showHTML5 . f)
     in gen is
