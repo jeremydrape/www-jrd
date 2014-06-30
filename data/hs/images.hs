@@ -10,6 +10,7 @@
 ,("74600017","Three Paintings, 2014")
 ,("63050037","The Chocolate Box, 2014")
 ,("74600016","Reflection (Wallace collection), 2014")
+,("74590020","Triptych, 2014")
 ,("49290037","Man Looking out to Sea, 2010")
 ,("7ferry","Ferry, 2005")
 ,("Breakdown","Breakdown, 2010")
