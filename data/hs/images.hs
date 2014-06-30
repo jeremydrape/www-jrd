@@ -18,7 +18,6 @@
 ,("Man-With-Bike","Man with Bike (London), 2010")
 ,("Model","Chloe Modelling, 2010")
 ,("richard2","Richard in Studio, 2010")
-,("FilmNotes-122","Woman with Umbrella, 2009")
 ,("FilmNotes-354","Rolls, 2010")
 ,("interior","Interior, Unknown")
 ,("14","Jean")
