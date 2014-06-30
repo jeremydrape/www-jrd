@@ -3,6 +3,7 @@
 ,("63020013","Intersection, 2014")
 ,("74590032","Victory Life Baptist Church, 2014")
 ,("74590011","V&A, 2014")
+,("74590015","Crucifixion II, 2014")
 ,("63000035","Teesdale street, 2014")
 ,("49290037","Man Looking out to Sea, 2010")
 ,("7ferry","Ferry, 2005")
