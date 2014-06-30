@@ -1,5 +1,4 @@
-[,("74590032","Victory Life Baptist Church, 2014")
-,("63050029","Soho dinner, 2014")
+[,("63050029","Soho dinner, 2014")
 ,("63020013","Intersection, 2014")
 ,("63000035","Teesdale street, 2014")
 ,("49290037","Man Looking out to Sea, 2010")
