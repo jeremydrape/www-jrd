@@ -10,7 +10,7 @@ e_config :: W.Config
 e_config =
     W.Config {W.cfg_vcs = Just (W.Git
                                ,("jeremy drape <jeremy.drape@gmail.com>"
-                                ,Nothing {-Just "sp"-}))
+                                ,Just "www-jrd.git"))
              ,W.cfg_url = "http://jeremydrape.com"
              ,W.cfg_pwd = Nothing}
 
