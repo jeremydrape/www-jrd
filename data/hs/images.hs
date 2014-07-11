@@ -3,7 +3,7 @@
 ,("87530033","St Paul's, 2014")
 ,("87520005","Hackney Central, 2014")
 ,("63050029","Soho dinner, 2014")
-,("63020013(EDIT)","Intersection, 2014")
+,("63020013-EDIT","Intersection, 2014")
 ,("63000025","Rubbish, 2014")
 ,("74600024","Reflection (Koenig Books), 2014")
 ,("74590032","Victory Life Baptist Church, 2014")
