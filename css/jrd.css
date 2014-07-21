@@ -18,6 +18,6 @@ a,a:visited {color: black}
 code {font-family: "Times",monospace}
 
 /* class */
-div.title {color: #ffffff}
+div.title {color: #000}
 div.ix {display: inline}
 div.ix {padding-right: 1em}
