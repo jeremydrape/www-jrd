@@ -9,7 +9,6 @@
 ,("49290037","Man Looking out to Sea, 2010")
 ,("74590016","Dad at the V&A, 2014")
 ,("4sanja","Sanja in her studio")
-,("74590015","Crucifixion II, 2014")
 ,("77860004","Turn I, 2014")
 ,("7ferry","Ferry, 2005")
 ,("87520005","Hackney Central, 2014")
