@@ -14,6 +14,7 @@
 ,("87520005","Hackney Central, 2014")
 ,("63050029","Soho dinner, 2014")
 ,("63000025","Rubbish, 2014")
+,("Heavy%20Weight",Untitled")
 ,("74600024","Reflection (Koenig Books), 2014")
 ,("74590032","Victory Life Baptist Church, 2014")
 ,("74590020","Triptych, 2014")
