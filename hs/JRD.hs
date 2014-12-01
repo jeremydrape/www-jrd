@@ -46,7 +46,8 @@ load_opt_set dir = do
 
 slideshow_pre :: State -> [String]
 slideshow_pre st =
-    ["<html>"
+    ["<!DOCTYPE html>"
+    ,"<html lang=\"en\">"
     ,"<head>"
     ,concatMap H.showHTML5 (std_meta "")
     ,"<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js\"></script>"
