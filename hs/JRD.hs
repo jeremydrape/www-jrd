@@ -64,7 +64,7 @@ slideshow_pre st =
     ,"     data-cycle-manual-fx=\"fadeout\""
     ,"     data-cycle-manual-speed=\"50\""
     ,"     data-cycle-caption=\"#caption\""
-    ,"     data-cycle-caption-template=\"{{cycleTitle}}\""
+    ,"     data-cycle-caption-template=\"{{cycleTitle}}\">"
     ]
 
 slideshow_post :: [String]
