@@ -46,13 +46,14 @@ load_opt_set dir = do
 
 slideshow_pre :: State -> [String]
 slideshow_pre st =
-    ["<hmtl>"
+    ["<html>"
     ,"<head>"
     ,concatMap H.showHTML5 (std_meta "")
     ,"<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js\"></script>"
     ,"<script src=\"http://malsup.github.com/jquery.cycle2.js\"></script>"
     ,"</head>"
     ,"<body>"
+    ,"<div class=\"main\">"
     ,H.showHTML5 (menu_html st)
     ,"<div class=\"cycle-slideshow\""
     ,"     data-cycle-fx=\"fadeout\""
@@ -69,6 +70,7 @@ slideshow_post :: [String]
 slideshow_post =
     ["</div>"
     ,"<div class=\"title\" id=\"caption\"></div>"
+    ,"</div>"
     ,"</body>"]
 
 -- > let d = "/home/rohan/ut/www-jrd/"
