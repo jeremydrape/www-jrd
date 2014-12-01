@@ -1,2 +1,2 @@
-[("timeout","3000")
+[("timeout","6000")
 ,("image-url","false")]
