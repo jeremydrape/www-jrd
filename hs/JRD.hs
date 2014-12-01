@@ -85,6 +85,7 @@ gen_slideshow st =
                    "false" -> Nothing
                    _ -> Just (H.mk_attr "data-cycle-hash" k)
         f (k,nm) = H.img ([H.class' "next"
+                          ,H.alt k
                           ,H.src ("data/jpeg/h-500" </> k <.> "jpeg")
                           ,H.mk_attr "data-cycle-title" nm] ++
                           catMaybes [addr k])
