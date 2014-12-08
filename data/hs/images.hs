@@ -11,6 +11,5 @@
 ,("4sanja","Sanja in her studio")
 ,("77860004","Turn I, 2014")
 ,("7ferry","Ferry, 2005")
-,("63050029","Soho dinner, 2014")
 ,("Breakdown","Breakdown, 2010")
 ]
