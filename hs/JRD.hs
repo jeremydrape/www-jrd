@@ -56,6 +56,7 @@ slideshow_pre st =
     ,"<body>"
     ,"<div class=\"main\">"
     ,H.showHTML5 (menu_html st)
+    ,"<div class=\"content\">"
     ,"<div class=\"cycle-slideshow\""
     ,"     data-cycle-fx=\"fadeout\""
     ,"     data-cycle-timeout=\"" ++ opt_lookup st "timeout" "8000" ++ "\""
@@ -71,7 +72,8 @@ slideshow_post :: [String]
 slideshow_post =
     ["</div>"
     ,"<div class=\"title\" id=\"caption\"></div>"
-    ,"</div>"
+    ,"</div> <!-- end content -->"
+    ,"</div> <!-- end main -->"
     ,"</body>"]
 
 -- > let d = "/home/rohan/ut/www-jrd/"
