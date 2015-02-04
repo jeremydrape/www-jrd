@@ -6,4 +6,17 @@
  ,("Inside6","Untitled, 2014")]
 ,[("DD_4","Split Stairs, 2014")
 ,("DD_7","Mile End, 2014")
-,("DD_6","Fernandez & Wells, 2014")]]
+,("DD_6","Fernandez & Wells, 2014")
+,("DD_16","Moorgate, 2014")
+,("DD_18","Bed, 2014")
+,("DD_19","Barbican, 2014")
+,("DD_20","F at the Barbican, 2014")
+,("DD_21","Wall, 2014")
+,("DD_22","Soho Dinner, 2014")
+,("DD_23","Threadneedle Street, 2014")
+,("DD_24","Fallen Tree, 2014")
+,("DD_25","V&A, 2014")
+,("DD_26","Rubbish Camden Town, 2014")
+,("DD_27","St Pauls, 2014")
+,("DD_17","Slide, 2014")
+,("DD_15","Victoria Park, 2014")]]
