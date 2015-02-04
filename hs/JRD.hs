@@ -61,6 +61,7 @@ slideshow_pre st =
     ,"<div class=\"cycle-slideshow\""
     ,"     data-cycle-fx=\"fadeout\""
     ,"     data-cycle-timeout=\"" ++ opt_lookup st "timeout" "8000" ++ "\""
+    ,"     data-cycle-paused=\"" ++ opt_lookup st "paused" "false" ++ "\""
     ,"     data-cycle-speed=\"50\""
     ,"     data-cycle-next=\".next\""
     ,"     data-cycle-manual-fx=\"fadeout\""
