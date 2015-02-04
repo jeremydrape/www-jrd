@@ -1,4 +1,4 @@
 # [JEREMY DRAPE](./?m=about)
 
-- [Inside The Mountain](./?s=0)
+- [Inside The Mountain](./)
 - [Dark Days](./?s=1)
