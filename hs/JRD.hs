@@ -15,6 +15,7 @@ type Image_Name = String
 type Image_Title = String
 type Image = (Image_Name,Image_Title)
 type Image_Set = [Image]
+type Image_Group = [Image_Set]
 type Opt = [(String,String)]
 type State = (Opt,MD,Image_Set)
 
@@ -34,8 +35,8 @@ load_md dir ps = do
   ms <- mapM f ps
   return (zip ps ms)
 
-load_image_set :: FilePath -> IO Image_Set
-load_image_set dir = do
+load_image_group :: FilePath -> IO Image_Group
+load_image_group dir = do
   let fn = dir </> "data/hs/images.hs"
   fmap read (I.readFile fn)
 
@@ -77,7 +78,7 @@ slideshow_post =
     ,"</body>"]
 
 -- > let d = "/home/rohan/ut/www-jrd/"
--- > img <- load_image_set d
+-- > img <- load_image_group d
 -- > md <- load_md d ["menu"]
 -- > writeFile (d </> "ss.html") (gen_slideshow md img)
 gen_slideshow :: State -> String

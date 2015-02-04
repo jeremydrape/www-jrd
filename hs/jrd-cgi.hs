@@ -41,29 +41,35 @@ mk_front st = do
 mk_front_ss :: State -> W.Result
 mk_front_ss st = W.utf8_html_output (gen_slideshow st)
 
-dispatch :: State -> W.Parameters -> W.Result
-dispatch st (m,p,q) = do
-  case (m,p,q) of
-    ("GET",_,[("e",d)]) -> W.edit_get d
-    ("POST",_,[("e",_)]) -> W.edit_post e_config ""
-    ("GET",_,[("i",i)]) -> case img_title st i of
-                             Nothing -> mk_front st
-                             Just t -> W.utf8_html_output (mk_img st (i,t))
-    ("GET",_,[("m","ix")]) -> W.utf8_html_output (mk_ix st)
-    ("GET",_,[("m","resize")]) -> C.liftIO proc_resize >>
-                                  W.utf8_text_output "jrd: m=resize"
-    ("GET",_,[("m","upload")]) -> W.upload_get "data/jpeg" ".jpeg"
-    ("POST",_,[("m","upload")]) ->
-        do r <- W.upload_post e_config
-           C.liftIO proc_resize
-           return r
-    ("GET",_,[("m",mt)]) -> W.utf8_html_output (mk_md st mt)
-    ("GET",_,[]) -> mk_front_ss st
-    _ -> W.utf8_text_output "jrd: dispatch error"
+dispatch :: (Opt,MD,Image_Group) -> W.Parameters -> W.Result
+dispatch (opt,md,img_grp) (m,p,q) =
+    let ix = read (W.q_default "s" "0" q)
+        img_set = img_grp !! ix
+        st = (opt,md,img_set)
+        q' = W.q_remkey "s" q
+    in case (m,p,q') of
+         ("GET",_,[("e",d)]) -> W.edit_get d
+         ("POST",_,[("e",_)]) -> W.edit_post e_config ""
+         ("GET",_,[("i",i)]) ->
+           case img_title st i of
+             Nothing -> mk_front st
+             Just t -> W.utf8_html_output (mk_img st (i,t))
+         ("GET",_,[("m","ix")]) -> W.utf8_html_output (mk_ix st)
+         ("GET",_,[("m","resize")]) ->
+           C.liftIO proc_resize >>
+           W.utf8_text_output "jrd: m=resize"
+         ("GET",_,[("m","upload")]) -> W.upload_get "data/jpeg" ".jpeg"
+         ("POST",_,[("m","upload")]) ->
+           do r <- W.upload_post e_config
+              C.liftIO proc_resize
+              return r
+         ("GET",_,[("m",mt)]) -> W.utf8_html_output (mk_md st mt)
+         ("GET",_,[]) -> mk_front_ss st
+         _ -> W.utf8_text_output "jrd: dispatch error"
 
 main :: IO ()
 main = do
   opt <- load_opt_set "."
-  images <- load_image_set "."
+  images <- load_image_group "."
   md <- load_md "." ["menu","about"]
   W.run_cgi (opt,md,images) dispatch
