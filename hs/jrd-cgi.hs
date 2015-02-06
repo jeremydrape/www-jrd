@@ -51,9 +51,9 @@ dispatch (opt,md,img_grp) (m,p,q) =
          ("GET",_,[("e",d)]) -> W.edit_get d
          ("POST",_,[("e",_)]) -> W.edit_post e_config ""
          ("GET",_,[("i",i)]) ->
-           case img_title st i of
+           case img_grp_lookup img_grp i of
              Nothing -> mk_front st
-             Just t -> W.utf8_html_output (mk_img st (i,t))
+             Just (n,t) -> W.utf8_html_output (mk_img (opt,md,img_grp !! n) (i,t))
          ("GET",_,[("m","ix")]) -> W.utf8_html_output (mk_ix st)
          ("GET",_,[("m","resize")]) ->
            C.liftIO proc_resize >>

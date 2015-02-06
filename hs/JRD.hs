@@ -25,6 +25,16 @@ img_title (_,_,is) k = lookup k is
 img_lookup :: State -> Image_Name -> Maybe Image
 img_lookup (_,_,is) k = find ((== k) . fst) is
 
+-- | Variant that gives both set index and title.
+img_grp_lookup :: Image_Group -> Image_Name -> Maybe (Int,Image_Title)
+img_grp_lookup g nm =
+    let f n g' = case g' of
+                   [] -> Nothing
+                   s:g'' -> case lookup nm s of
+                              Nothing -> f (n + 1) g''
+                              Just r -> Just (n,r)
+    in f 0 g
+
 opt_lookup :: State -> String -> String -> String
 opt_lookup (o,_,_) k def = fromMaybe def (lookup k o)
 
@@ -154,7 +164,7 @@ mk_img_div sz cl (i,t) =
         bd = case t of
                Nothing -> [H.a ln im]
                Just t' -> [H.a ln im,div_c "title" [H.cdata t']]
-    in div_c (unwords ["image",cl]) bd
+    in div_c (unwords ["image","content",cl]) bd
 
 mk_img :: State -> (String,String) -> String
 mk_img st (mt,nm) = mk_frame st mt [mk_img_div 500 "std" (mt,Just nm)]
