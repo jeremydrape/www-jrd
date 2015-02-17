@@ -86,6 +86,14 @@ slideshow_post =
     ,"<div class=\"title\" id=\"caption\"></div>"
     ,"</div> <!-- end content -->"
     ,"</div> <!-- end main -->"
+    ,"<script>"
+    ,"addEventListener('keydown' , function(ev) {"
+    ,"  switch(ev.keyCode) {"
+    ,"    case 37: $('.cycle-slideshow').cycle('prev'); break;"
+    ,"    case 39: $('.cycle-slideshow').cycle('next'); break;"
+    ,"  }"
+    ,"});"
+    ,"</script>"
     ,"</body>"]
 
 -- > let d = "/home/rohan/ut/www-jrd/"

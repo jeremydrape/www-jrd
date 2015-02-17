@@ -30,5 +30,5 @@ div.about, div.content {
     text-align: center;
     background-color: transparent;
 }
-div.title {color: #ffffff}
+div.title {margin-top: 2em;color: #fff}
 div.cycle-slideshow {text-align: center}
