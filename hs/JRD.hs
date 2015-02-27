@@ -63,6 +63,7 @@ slideshow_pre st =
     ,concatMap H.showHTML5 (std_meta "")
     ,"<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js\"></script>"
     ,"<script src=\"http://malsup.github.com/jquery.cycle2.js\"></script>"
+    ,"<script src=\"http://malsup.github.io/min/jquery.cycle2.swipe.min.js\"></script>"
     ,"</head>"
     ,"<body>"
     ,"<div class=\"main\">"
@@ -72,7 +73,9 @@ slideshow_pre st =
     ,"     data-cycle-fx=\"fadeout\""
     ,"     data-cycle-timeout=\"" ++ opt_lookup st "timeout" "8000" ++ "\""
     ,"     data-cycle-paused=\"" ++ opt_lookup st "paused" "false" ++ "\""
+    ,"     data-cycle-swipe=\"" ++ opt_lookup st "swipe" "false" ++ "\""
     ,"     data-cycle-speed=\"50\""
+    ,"     data-cycle-prev=\".prev\""
     ,"     data-cycle-next=\".next\""
     ,"     data-cycle-manual-fx=\"fadeout\""
     ,"     data-cycle-manual-speed=\"50\""
