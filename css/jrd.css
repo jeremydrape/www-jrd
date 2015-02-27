@@ -1,6 +1,13 @@
 /* @ */
-@media screen {body {margin: 4em auto}} /* center: horizontal */
-@media all and (max-width: 800px) {body {margin: 1em}}
+@media screen {
+    body {margin: 4em auto} /* center: horizontal */
+    div.menu {float: left; margin: 0 1em 2.5em 3em;}
+}
+@media all and (max-width: 800px) {
+    body {margin: 0.5em}
+    div.menu {float: none; margin: 0}
+    div.menu ul {margin:0}
+}
 
 /* plain */
 html {}
@@ -16,13 +23,10 @@ ul li {list-style-type: none}
 a,a:visited {color: black}
 a:hover {color: #555}
 code {font-family: "Times",monospace}
+img {width: 100%}
 
 /* class */
-div.menu {
-    float: left;
-    margin: 0 1em 2.5em 3em;
-    background-color: transparent;
-}
+div.menu {background-color: transparent}
 div.about, div.content {
     margin: 0 auto;
     padding: 1em 0;
