@@ -23,7 +23,7 @@ ul li {list-style-type: none}
 a,a:visited {color: black}
 a:hover {color: #555}
 code {font-family: "Times",monospace}
-img {width: 100%}
+img {max-width: 100%}
 
 /* class */
 div.menu {background-color: transparent}
