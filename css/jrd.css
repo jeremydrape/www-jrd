@@ -17,16 +17,18 @@ body {color: black}
 body {line-height: 1.15em}
 h1 {font-size: 1.0em}
 h1 {font-weight: normal}
-h1 {text-decoration: underline}
+h1 {text-decoration: none}
 ul {padding-left: 0}
 ul li {list-style-type: none}
 a,a:visited {color: black}
 a:hover {color: #555}
 code {font-family: "Times",monospace}
 img {max-width: 100%}
+img:hover {cursor: default}
 
 /* class */
 div.menu {background-color: transparent}
+div.menu a {text-decoration: none}
 div.about, div.content {
     margin: 0 auto;
     padding: 1em 0;

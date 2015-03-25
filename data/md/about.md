@@ -1,4 +1,4 @@
-[JEREMY DRAPE](./) is a London based photographer.
+[JEREMY DRAPE](./) is a Melbourne based photographer.
 He has a BFA(Honours) from the Victorian College of the Arts.
 
 Enquiries: <contact@jeremydrape.com>
