@@ -31,7 +31,7 @@ div.about, div.content {
     margin: 0 auto;
     padding: 1em 0;
     max-width: 55em;
-    text-align: center;
+    text-align: left;
     background-color: transparent;
 }
 div.title {margin-top: 2em;color: #fff}
