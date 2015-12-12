@@ -3,12 +3,13 @@ module JRD where
 import Data.List {- base -}
 import Data.Maybe {- base -}
 import System.FilePath {- filepath -}
-import qualified System.IO.Strict as I {- strict -}
 import System.Process {- process -}
-import qualified Text.HTML.Light as H {- html-minimalist -}
-import qualified Text.HTML.Light.Composite as H {- html-minimalist -}
+
+import qualified Text.HTML.Light as H {- html-minus -}
+import qualified Text.HTML.Light.Composite as H {- html-minus -}
 import qualified Text.Pandoc.Minus as M {- pandoc-minus -}
 import qualified Text.XML.Light as X {- xml -}
+import qualified WWW.Minus.IO as W {- xml -}
 
 type MD = [(String,String)]
 type Image_Name = String
@@ -41,19 +42,19 @@ opt_lookup (o,_,_) k def = fromMaybe def (lookup k o)
 -- > md <- load_md "/home/rohan/ut/www-jrd/" ["menu","about"]
 load_md :: FilePath -> [String] -> IO MD
 load_md dir ps = do
-  let f p = I.readFile (dir </> "data/md" </> p <.> "md")
+  let f p = W.read_utf8 (dir </> "data/md" </> p <.> "md")
   ms <- mapM f ps
   return (zip ps ms)
 
 load_image_group :: FilePath -> IO Image_Group
 load_image_group dir = do
   let fn = dir </> "data/hs/images.hs"
-  fmap read (I.readFile fn)
+  fmap read (W.read_utf8 fn)
 
 load_opt_set :: FilePath -> IO Opt
 load_opt_set dir = do
   let fn = dir </> "data/hs/opt.hs"
-  fmap read (I.readFile fn)
+  fmap read (W.read_utf8 fn)
 
 slideshow_pre :: State -> [String]
 slideshow_pre st =
