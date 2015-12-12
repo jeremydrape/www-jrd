@@ -5,3 +5,7 @@ all:
 
 clean:
 	rm -f jrd-cgi *.hi *.o
+
+ln-local:
+	rm -f WWW
+	ln -s $(HOME)/sw/www-minus/WWW WWW
