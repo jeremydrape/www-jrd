@@ -87,8 +87,8 @@ slideshow_pre st =
 slideshow_post :: [String]
 slideshow_post =
     ["</div>"
-    ,"<div class=\"title\" id=\"caption\"></div>"
     ,"</div> <!-- end content -->"
+    --,"<div class=\"title\" id=\"caption\"></div>"
     ,"</div> <!-- end main -->"
     ,"<script>"
     ,"addEventListener('keydown' , function(ev) {"
