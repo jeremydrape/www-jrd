@@ -7,6 +7,6 @@ clean:
 	rm -f jrd-cgi *.hi *.o
 
 ln-local:
-	rm -f HTML WWW
-	ln -s $(HOME)/sw/html-minus/HTML HTML
+	rm -f Text WWW
+	ln -s $(HOME)/sw/html-minus/Text Text
 	ln -s $(HOME)/sw/www-minus/WWW WWW
