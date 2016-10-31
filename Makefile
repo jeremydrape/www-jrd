@@ -27,3 +27,6 @@ remote-sp:
 
 remote-update:
 	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;make pull-sp-http;make all)"
+
+remote-commit:
+	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;git commit -a -m `date +%F/%T`)"
