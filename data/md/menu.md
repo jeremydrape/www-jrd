@@ -1,7 +1,7 @@
 <div class="jeremy_drape">JEREMY DRAPE</div>
 
 - [Against the Sky](./?s=0)
-- [London 2014](./?s=1)
+- [London](./?s=1)
 - [The Carrier](./?s=2)
 - [Inside the Mountain](./?s=3)
 <!-- - [REMAINDER](./?s=4) -->
