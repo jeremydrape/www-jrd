@@ -1,7 +1,7 @@
 [[]
 ,[("DD_44","Crucifixion, 2014")
  ,("DD_36","Dad (V&A), 2014")
- ,("DD_33","Clocks, Cameras & Projectors, 2014")
+ ,("DD_33","Clocks, Cameras &<br />Projectors, 2014")
  ]
 ,[("3_ferry","Ferry, 2005")
  ,("Manwithbike","Man with bike, 2010")
