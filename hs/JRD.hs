@@ -6,15 +6,23 @@ import System.Process {- process -}
 import Text.Printf {- base -}
 
 import qualified Text.XML.Light as X {- xml -}
-import qualified WWW.Minus.IO as W {- xml -}
 
 import qualified Text.HTML.Minus as H {- html-minus -}
 import qualified Text.Pandoc.Minus as M {- pandoc-minus -}
+import qualified WWW.Minus.IO as W {- www-minus -}
 
 -- * UTIL
 
 div_c :: String -> [X.Content] -> X.Content
 div_c c = H.div [H.class' c]
+
+html_en :: [X.Content] -> X.Element
+html_en = H.html [H.lang "en"]
+
+md_to_html :: String -> String
+md_to_html s =
+    let s' = M.readMarkdown M.defaultParserState (s ++ "\n")
+    in M.writeHtmlString M.defaultWriterOptions s'
 
 -- * PATHS
 
@@ -104,7 +112,7 @@ slideshow_pre st =
     ["<!DOCTYPE html>"
     ,"<html lang=\"en\">"
     ,"<head>"
-    ,concatMap H.showHTML5 (std_meta "")
+    ,concatMap H.showHTML5 (jrd_meta "")
     ,"<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js\"></script>"
     ,"<script src=\"http://malsup.github.com/jquery.cycle2.js\"></script>"
     ,"<script src=\"http://malsup.github.io/min/jquery.cycle2.swipe.min.js\"></script>"
@@ -131,7 +139,7 @@ slideshow_post :: [String]
 slideshow_post =
     ["</div>"
     ,"</div> <!-- end content -->"
-    --,"<div class=\"title\" id=\"caption\"></div>"
+    --,"<div class=\"title\" id=\"caption\"></div>" -- SEE data/md/menu.md
     ,"</div> <!-- end main -->"
     ,"<script>"
     ,"addEventListener('keydown' , function(ev) {"
@@ -145,9 +153,9 @@ slideshow_post =
 
 -- > img <- load_image_group prj_dir
 -- > md <- load_md prj_dir ["menu"]
--- > writeFile (prj_dir </> "ss.html") (gen_slideshow md img)
-gen_slideshow :: State -> String
-gen_slideshow st =
+-- > writeFile (prj_dir </> "ss.html") (mk_slideshow md img)
+mk_slideshow :: State -> String
+mk_slideshow st =
     let is = st_img_set st
         addr k = case st_opt_lookup st "image-url" "true" of
                    "false" -> Nothing
@@ -161,16 +169,10 @@ gen_slideshow st =
         gen = pkg . map (H.showHTML5 . f)
     in gen is
 
-md_html :: String -> String
-md_html s =
-    let s' = M.readMarkdown M.defaultParserState (s ++ "\n")
-    in M.writeHtmlString M.defaultWriterOptions s'
+-- * HTML
 
-std_html_attr :: [X.Attr]
-std_html_attr = [H.lang "en"]
-
-std_meta :: String -> [X.Content]
-std_meta _ =
+jrd_meta :: String -> [X.Content]
+jrd_meta _ =
     [H.title [] [H.cdata "jeremydrape.com"]
     ,H.meta_author "jeremy drape"
     ,H.meta_description "jeremy drape is a canberra based photographer"
@@ -184,23 +186,23 @@ std_meta _ =
 menu_html :: State -> X.Content
 menu_html (_,md,_,_) =
     case lookup "menu" md of
-      Just m -> div_c "menu" [H.cdata_raw (md_html m)]
+      Just m -> div_c "menu" [H.cdata_raw (md_to_html m)]
       _ -> div_c "menu" [H.cdata_raw "no menu?"]
 
 mk_frame :: State -> String -> [X.Content] -> String
 mk_frame st mt cn =
-    let hd = H.head [] (std_meta mt)
+    let hd = H.head [] (jrd_meta mt)
         bd = H.body [H.class' "image"] [div_c "main" (menu_html st : cn)]
-    in H.renderHTML5 (H.html std_html_attr [hd,bd])
+    in H.renderHTML5 (html_en [hd,bd])
 
 mk_md :: State -> String -> String
 mk_md (_,md,_,_) mt =
     let c = case lookup mt md of
-              Just m -> div_c mt [H.cdata_raw (md_html m)]
+              Just m -> div_c mt [H.cdata_raw (md_to_html m)]
               _ -> div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst md))]
-        hd = H.head [] (std_meta mt)
+        hd = H.head [] (jrd_meta mt)
         bd = H.body [H.class' mt] [div_c "main" [c]]
-    in H.renderHTML5 (H.html std_html_attr [hd,bd])
+    in H.renderHTML5 (html_en [hd,bd])
 
 mk_img_div :: Int -> [String] -> (String,Maybe String) -> X.Content
 mk_img_div sz cl (i,t) =
@@ -217,8 +219,6 @@ mk_img st (mt,nm) = mk_frame st mt [mk_img_div 500 ["std"] (mt,Just nm)]
 img_id :: Int -> String
 img_id n = printf "img_%04d" n
 
--- > st <- load_st prj_dir
--- > mk_ix st
 mk_ix :: State -> String
 mk_ix st =
     let (_,_,ig,_) = st
