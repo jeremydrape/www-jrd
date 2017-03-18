@@ -11,6 +11,11 @@ import qualified WWW.Minus.IO as W {- xml -}
 import qualified Text.HTML.Minus as H {- html-minus -}
 import qualified Text.Pandoc.Minus as M {- pandoc-minus -}
 
+-- * UTIL
+
+div_c :: String -> [X.Content] -> X.Content
+div_c c = H.div [H.class' c]
+
 -- * PATHS
 
 prj_dir :: FilePath
@@ -92,7 +97,7 @@ load_st dir = do
   md <- load_md dir ["menu","about"]
   return (opt,md,images,0)
 
--- * 
+-- * SLIDESHOW
 
 slideshow_pre :: State -> [String]
 slideshow_pre st =
@@ -162,7 +167,7 @@ md_html s =
     in M.writeHtmlString M.defaultWriterOptions s'
 
 std_html_attr :: [X.Attr]
-std_html_attr = [H.lang "en" ]
+std_html_attr = [H.lang "en"]
 
 std_meta :: String -> [X.Content]
 std_meta _ =
@@ -175,9 +180,6 @@ std_meta _ =
     ,H.meta [H.name "google-site-verification"
             ,H.content "Ujn7EZ-8e4SlmGvR5e7YFAAyjt4VphkNCQTLZqkuqkg"]
     ]
-
-div_c :: String -> [X.Content] -> X.Content
-div_c c = H.div [H.class' c]
 
 menu_html :: State -> X.Content
 menu_html (_,md,_,_) =
@@ -195,7 +197,7 @@ mk_md :: State -> String -> String
 mk_md (_,md,_,_) mt =
     let c = case lookup mt md of
               Just m -> div_c mt [H.cdata_raw (md_html m)]
-              _ -> div_c mt [H.cdata_raw ("mk-md: ?" ++ mt ++ show md)]
+              _ -> div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst md))]
         hd = H.head [] (std_meta mt)
         bd = H.body [H.class' mt] [div_c "main" [c]]
     in H.renderHTML5 (H.html std_html_attr [hd,bd])
@@ -222,7 +224,7 @@ mk_ix st =
     let (_,_,ig,_) = st
         is = zip [0..] (concat ig)
         cn = map (\(n,(k,_)) -> mk_img_div 150 ["ix",img_id n] (k,Nothing)) is
-    in mk_frame st "ix" [H.div [H.class' "meta_ix"] cn]
+    in mk_frame st "ix" [div_c "meta_ix" cn]
 
 proc_resize :: IO ()
 proc_resize = do
