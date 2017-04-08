@@ -18,8 +18,8 @@ mk_front_ss st = W.utf8_html_output (J.mk_slideshow st)
 
 dispatch :: J.State -> W.Parameters -> W.Result
 dispatch (opt,md,img_grp,_) (m,p,q) =
-    let ix = read (W.q_default "s" "0" q)
-        st = (opt,md,img_grp,ix)
+    let s_ix = fmap read (W.q_lookup "s" q)
+        st = (opt,md,img_grp,s_ix)
         q' = W.q_remkey "s" q
     in case (m,p,q') of
          ("GET",_,[("e",d)]) -> E.edit_get d
@@ -27,7 +27,7 @@ dispatch (opt,md,img_grp,_) (m,p,q) =
          ("GET",_,[("i",i)]) ->
            case J.img_grp_lookup img_grp i of
              Nothing -> mk_front_ss st
-             Just (n,t) -> W.utf8_html_output (J.mk_img (opt,md,img_grp,n) (i,t))
+             Just (n,t) -> W.utf8_html_output (J.mk_img (opt,md,img_grp,Just n) (i,t))
          ("GET",_,[("m","ix")]) -> W.utf8_html_output (J.mk_ix st)
          ("GET",_,[("m","resize")]) ->
            C.liftIO J.proc_resize >>

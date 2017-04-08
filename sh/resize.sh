@@ -1,9 +1,11 @@
 #!/bin/sh
+#
+# sh sh/resize.sh data/jpeg
 
 d=$1
 verbose=false
 
-for s in 150 500
+for s in 150 250 350 500
 do
     o=h-$s
     mkdir -p $d/$o

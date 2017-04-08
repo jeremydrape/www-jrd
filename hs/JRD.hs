@@ -48,7 +48,7 @@ type Image_Set = [Image]
 type Image_Group = [Image_Set]
 type Set_Index = Int
 type Opt = [(String,String)]
-type State = (Opt,MD,Image_Group,Set_Index)
+type State = (Opt,MD,Image_Group,Maybe Set_Index)
 
 opt_lookup :: Opt -> String -> String -> String
 opt_lookup o k def = fromMaybe def (lookup k o)
@@ -67,7 +67,7 @@ st_opt_lookup :: State -> String -> String -> String
 st_opt_lookup (o,_,_,_) = opt_lookup o
 
 st_img_set :: State -> Image_Set
-st_img_set (_,_,ig,ix) = ig !! ix
+st_img_set (_,_,ig,ix) = maybe (concat ig) (ig !!) ix
 
 {-
 import Data.List {- base -}
@@ -103,7 +103,7 @@ load_st dir = do
   opt <- load_opt_set dir
   images <- load_image_group dir
   md <- load_md dir ["menu","about"]
-  return (opt,md,images,0)
+  return (opt,md,images,Nothing)
 
 -- * SLIDESHOW
 
@@ -221,9 +221,9 @@ img_id n = printf "img_%04d" n
 
 mk_ix :: State -> String
 mk_ix st =
-    let (_,_,ig,_) = st
-        is = zip [0..] (concat ig)
-        cn = map (\(n,(k,_)) -> mk_img_div 150 ["ix",img_id n] (k,Nothing)) is
+    let is = zip [0..] (st_img_set st)
+        sz = read (st_opt_lookup st "ix:image-size" "150")
+        cn = map (\(n,(k,_)) -> mk_img_div sz ["ix",img_id n] (k,Nothing)) is
     in mk_frame st "ix" [div_c "meta_ix" cn]
 
 proc_resize :: IO ()
