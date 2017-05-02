@@ -43,40 +43,37 @@ md_fn nm = "data/md" </> nm <.> "md"
 -- * TYPES
 
 type MD = [(String,String)]
+type Series_Ix = String
 type Image_Name = String
 type Image_Title = String
-type Image_Flags = String
-type Image = (Image_Name,Image_Title,Image_Flags)
-type Image_Set = [Image]
-type Set_Title = String
-type Image_Group = [(Set_Title,Image_Set)]
-type Set_Index = Int
+type Image_Ix = String
+type Image_Z = Int
+type Image = (Series_Ix,Image_Name,Image_Title,Image_Ix,Image_Z)
 type Opt = [(String,String)]
-type State = (Opt,MD,Image_Group,Maybe Set_Title)
+type State = (Opt,MD,[Image],(Series_Ix,Image_Ix))
 
 opt_lookup :: Opt -> String -> String -> String
 opt_lookup o k def = fromMaybe def (lookup k o)
 
 -- | Give both set index and title.
-img_grp_lookup :: Image_Group -> Image_Name -> Maybe (Set_Title,Image_Title)
-img_grp_lookup g nm =
-    let recur g' =
-            case g' of
-              [] -> Nothing
-              (x,s):g'' ->
-                  case find (\(fn,_,_) -> fn == nm) s of
-                    Nothing -> recur g''
-                    Just (_,r,_) -> Just (x,r)
-    in recur g
+img_lookup_by_name :: Image_Name -> [Image] -> Maybe Image
+img_lookup_by_name nm =
+    let f (_,nm',_,_,_) = nm == nm'
+    in find f
+
+img_z :: Image -> Int
+img_z (_,_,_,_,z) = z
+
+img_sort_by_z :: [Image] -> [Image]
+img_sort_by_z = sortBy (compare `on` img_z)
 
 st_opt_lookup :: State -> String -> String -> String
 st_opt_lookup (o,_,_,_) = opt_lookup o
 
-st_img_set :: State -> Image_Set
-st_img_set (_,_,ig,ix) =
-    case lookup (fromMaybe "" ix) ig of
-      Nothing -> concat (map snd ig) -- all? --
-      Just r -> r
+st_img_set :: State -> [Image]
+st_img_set (_,_,img,(s_ix,i_ix)) =
+    let f (s_ix',_,_,i_ix',_) = s_ix == s_ix' || i_ix == i_ix'
+    in filter f img
 
 {-
 import Data.List {- base -}
@@ -97,13 +94,6 @@ load_md dir ps = do
   ms <- mapM f ps
   return (zip ps ms)
 
-{-
-load_image_group :: FilePath -> IO Image_Group
-load_image_group dir = do
-  let fn = dir </> "data/hs/images.hs"
-  fmap read (W.read_file_utf8 fn)
--}
-
 load_opt_set :: FilePath -> IO Opt
 load_opt_set dir = do
   let fn = dir </> "data/hs/opt.hs"
@@ -114,7 +104,7 @@ load_st dir = do
   opt <- load_opt_set dir
   images <- load_image_data dir
   md <- load_md dir ["menu","about"]
-  return (opt,md,images,Nothing)
+  return (opt,md,images,("",""))
 
 -- * SLIDESHOW
 
@@ -171,11 +161,11 @@ mk_slideshow st =
         addr k = case st_opt_lookup st "image-url" "true" of
                    "false" -> Nothing
                    _ -> Just (H.mk_attr "data-cycle-hash" k)
-        f (k,nm,_) = H.img ([H.class' "next"
-                          ,H.alt k
-                          ,H.src (img_r_fn 500 k)
-                          ,H.mk_attr "data-cycle-title" nm] ++
-                          catMaybes [addr k])
+        f (_,k,nm,_,_) = H.img ([H.class' "next"
+                                ,H.alt k
+                                ,H.src (img_r_fn 500 k)
+                                ,H.mk_attr "data-cycle-title" nm] ++
+                                catMaybes [addr k])
         pkg s = unlines (concat [slideshow_pre st,s,slideshow_post])
         gen = pkg . map (H.showHTML5 . f)
     in gen is
@@ -232,9 +222,9 @@ img_id n = printf "img_%04d" n
 
 mk_ix :: State -> String
 mk_ix st =
-    let is = zip [0..] (st_img_set st)
+    let is = zip [0..] (img_sort_by_z (st_img_set st))
         sz = read (st_opt_lookup st "ix:image-size" "150")
-        cn = map (\(n,(k,_,_)) -> mk_img_div sz ["ix",img_id n] (k,Nothing)) is
+        cn = map (\(n,(_,k,_,_,_)) -> mk_img_div sz ["ix",img_id n] (k,Nothing)) is
     in mk_frame st "ix" [div_c "meta_ix" cn]
 
 proc_resize :: IO ()
@@ -244,26 +234,16 @@ proc_resize = do
 
 -- * CSV
 
-group_on :: Eq x => (a -> x) -> [a] -> [[a]]
-group_on f = map (map snd) . groupBy ((==) `on` fst) . map (\x -> (f x,x))
-
-collate_on_adjacent :: (Eq k,Ord k) => (a -> k) -> (a -> v) -> [a] -> [(k,[v])]
-collate_on_adjacent f g =
-    let h l = case l of
-                [] -> error "collate_on_adjacent"
-                l0:_ -> (f l0,map g l)
-    in map h . group_on f
-
 -- > load_image_data prj_dir
-load_image_data :: FilePath -> IO Image_Group
+load_image_data :: FilePath -> IO [Image]
 load_image_data dir = do
   let csv_fn = dir </> "data/csv/images.csv"
   str <- W.read_file_utf8 csv_fn
   let p = C.parseDSV False ',' str
       r = C.fromCSVTable (C.csvTable p)
-      f [s,fn,nm,opt] = (s,(fn,nm,opt))
+      f [s,fn,nm,opt,z] = (s,fn,nm,opt,read z)
       f _ = error "load_image_data"
-  return (collate_on_adjacent fst snd (map f r))
+  return (map f r)
 
 {-
 > import Data.List

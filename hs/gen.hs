@@ -1,4 +1,4 @@
-import Data.List.Split {- split -}
+import Data.List {- base -}
 import System.Random {- random -}
 import Text.Printf {- base -}
 
@@ -6,8 +6,14 @@ import qualified Sound.SC3.Lang.Random.Gen as L {- hsc3-lang -}
 
 import qualified JRD as J {- ut/www-jrd -}
 
+-- > take 4 img_offsets
 img_offsets :: [[Int]]
-img_offsets = chunksOf 4 (L.s_rrand 0 100 (mkStdGen 246873))
+img_offsets =
+    let t = L.s_rrand 0 300 (mkStdGen 246873)
+        r = L.s_rrand 0 150 (mkStdGen 174027)
+        b = L.s_rrand 0 300 (mkStdGen 380984)
+        l = L.s_rrand 0 150 (mkStdGen 023664)
+    in transpose [t,r,b,l]
 
 mk_padding :: [Int] -> String
 mk_padding p =

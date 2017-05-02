@@ -17,17 +17,18 @@ mk_front_ss :: J.State -> W.Result
 mk_front_ss st = W.utf8_html_output (J.mk_slideshow st)
 
 dispatch :: J.State -> W.Parameters -> W.Result
-dispatch (opt,md,img_grp,_) (m,p,q) =
-    let s_ix = W.q_lookup "s" q
-        st = (opt,md,img_grp,s_ix)
-        q' = W.q_remkey "s" q
+dispatch (opt,md,img_set,_) (m,p,q) =
+    let s_ix = W.q_default "s" "" q
+        i_ix = W.q_default "x" "" q
+        st = (opt,md,img_set,(s_ix,i_ix))
+        q' = W.q_remkeys ["s","x"] q
     in case (m,p,q') of
          ("GET",_,[("e",d)]) -> E.edit_get d
          ("POST",_,[("e",_)]) -> E.edit_post e_config ""
          ("GET",_,[("i",i)]) ->
-           case J.img_grp_lookup img_grp i of
+           case J.img_lookup_by_name i img_set of
              Nothing -> mk_front_ss st
-             Just (n,t) -> W.utf8_html_output (J.mk_img (opt,md,img_grp,Just n) (i,t))
+             Just (_,n,t,x,_z) -> W.utf8_html_output (J.mk_img (opt,md,img_set,(n,x)) (i,t))
          ("GET",_,[("m","ix")]) -> W.utf8_html_output (J.mk_ix st)
          ("GET",_,[("m","resize")]) ->
            C.liftIO J.proc_resize >>
@@ -39,7 +40,7 @@ dispatch (opt,md,img_grp,_) (m,p,q) =
               return r
          ("GET",_,[("m",mt)]) -> W.utf8_html_output (J.mk_md st mt)
          ("GET",_,[]) -> mk_front_ss st
-         _ -> W.utf8_text_output "jrd: dispatch error"
+         _ -> W.utf8_text_output ("jrd: dispatch error: " ++ show (m,p,q'))
 
 main :: IO ()
 main = J.load_st "." >>= \st -> W.run_cgi st dispatch
