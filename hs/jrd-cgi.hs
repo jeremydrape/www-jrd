@@ -18,7 +18,7 @@ mk_front_ss st = W.utf8_html_output (J.mk_slideshow st)
 
 dispatch :: J.State -> W.Parameters -> W.Result
 dispatch (opt,md,img_grp,_) (m,p,q) =
-    let s_ix = fmap read (W.q_lookup "s" q)
+    let s_ix = W.q_lookup "s" q
         st = (opt,md,img_grp,s_ix)
         q' = W.q_remkey "s" q
     in case (m,p,q') of

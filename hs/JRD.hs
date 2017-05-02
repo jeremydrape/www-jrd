@@ -1,11 +1,13 @@
 module JRD where
 
+import Data.Function {- base -}
+import Data.List {- base -}
 import Data.Maybe {- base -}
 import System.FilePath {- filepath -}
 import System.Process {- process -}
 import Text.Printf {- base -}
 
-import qualified Text.XML.Light as X {- xml -}
+import qualified Text.CSV.Lazy.String as C {- lazy-csv -}
 
 import qualified Text.HTML.Minus as H {- html-minus -}
 import qualified Text.Pandoc.Minus as M {- pandoc-minus -}
@@ -13,10 +15,10 @@ import qualified WWW.Minus.IO as W {- www-minus -}
 
 -- * UTIL
 
-div_c :: String -> [X.Content] -> X.Content
+div_c :: String -> [H.Content] -> H.Content
 div_c c = H.div [H.class' c]
 
-html_en :: [X.Content] -> X.Element
+html_en :: [H.Content] -> H.Element
 html_en = H.html [H.lang "en"]
 
 md_to_html :: String -> String
@@ -43,31 +45,38 @@ md_fn nm = "data/md" </> nm <.> "md"
 type MD = [(String,String)]
 type Image_Name = String
 type Image_Title = String
-type Image = (Image_Name,Image_Title)
+type Image_Flags = String
+type Image = (Image_Name,Image_Title,Image_Flags)
 type Image_Set = [Image]
-type Image_Group = [Image_Set]
+type Set_Title = String
+type Image_Group = [(Set_Title,Image_Set)]
 type Set_Index = Int
 type Opt = [(String,String)]
-type State = (Opt,MD,Image_Group,Maybe Set_Index)
+type State = (Opt,MD,Image_Group,Maybe Set_Title)
 
 opt_lookup :: Opt -> String -> String -> String
 opt_lookup o k def = fromMaybe def (lookup k o)
 
 -- | Give both set index and title.
-img_grp_lookup :: Image_Group -> Image_Name -> Maybe (Set_Index,Image_Title)
+img_grp_lookup :: Image_Group -> Image_Name -> Maybe (Set_Title,Image_Title)
 img_grp_lookup g nm =
-    let f n g' = case g' of
-                   [] -> Nothing
-                   s:g'' -> case lookup nm s of
-                              Nothing -> f (n + 1) g''
-                              Just r -> Just (n,r)
-    in f 0 g
+    let recur g' =
+            case g' of
+              [] -> Nothing
+              (x,s):g'' ->
+                  case find (\(fn,_,_) -> fn == nm) s of
+                    Nothing -> recur g''
+                    Just (_,r,_) -> Just (x,r)
+    in recur g
 
 st_opt_lookup :: State -> String -> String -> String
 st_opt_lookup (o,_,_,_) = opt_lookup o
 
 st_img_set :: State -> Image_Set
-st_img_set (_,_,ig,ix) = maybe (concat ig) (ig !!) ix
+st_img_set (_,_,ig,ix) =
+    case lookup (fromMaybe "" ix) ig of
+      Nothing -> concat (map snd ig) -- all? --
+      Just r -> r
 
 {-
 import Data.List {- base -}
@@ -88,10 +97,12 @@ load_md dir ps = do
   ms <- mapM f ps
   return (zip ps ms)
 
+{-
 load_image_group :: FilePath -> IO Image_Group
 load_image_group dir = do
   let fn = dir </> "data/hs/images.hs"
   fmap read (W.read_file_utf8 fn)
+-}
 
 load_opt_set :: FilePath -> IO Opt
 load_opt_set dir = do
@@ -101,7 +112,7 @@ load_opt_set dir = do
 load_st :: FilePath -> IO State
 load_st dir = do
   opt <- load_opt_set dir
-  images <- load_image_group dir
+  images <- load_image_data dir
   md <- load_md dir ["menu","about"]
   return (opt,md,images,Nothing)
 
@@ -160,7 +171,7 @@ mk_slideshow st =
         addr k = case st_opt_lookup st "image-url" "true" of
                    "false" -> Nothing
                    _ -> Just (H.mk_attr "data-cycle-hash" k)
-        f (k,nm) = H.img ([H.class' "next"
+        f (k,nm,_) = H.img ([H.class' "next"
                           ,H.alt k
                           ,H.src (img_r_fn 500 k)
                           ,H.mk_attr "data-cycle-title" nm] ++
@@ -171,7 +182,7 @@ mk_slideshow st =
 
 -- * HTML
 
-jrd_meta :: String -> [X.Content]
+jrd_meta :: String -> [H.Content]
 jrd_meta _ =
     [H.title [] [H.cdata "jeremydrape.com"]
     ,H.meta_author "jeremy drape"
@@ -183,13 +194,13 @@ jrd_meta _ =
             ,H.content "Ujn7EZ-8e4SlmGvR5e7YFAAyjt4VphkNCQTLZqkuqkg"]
     ]
 
-menu_html :: State -> X.Content
+menu_html :: State -> H.Content
 menu_html (_,md,_,_) =
     case lookup "menu" md of
       Just m -> div_c "menu" [H.cdata_raw (md_to_html m)]
       _ -> div_c "menu" [H.cdata_raw "no menu?"]
 
-mk_frame :: State -> String -> [X.Content] -> String
+mk_frame :: State -> String -> [H.Content] -> String
 mk_frame st mt cn =
     let hd = H.head [] (jrd_meta mt)
         bd = H.body [H.class' "image"] [div_c "main" (menu_html st : cn)]
@@ -204,7 +215,7 @@ mk_md (_,md,_,_) mt =
         bd = H.body [H.class' mt] [div_c "main" [c]]
     in H.renderHTML5 (html_en [hd,bd])
 
-mk_img_div :: Int -> [String] -> (String,Maybe String) -> X.Content
+mk_img_div :: Int -> [String] -> (String,Maybe String) -> H.Content
 mk_img_div sz cl (i,t) =
     let ln = [H.href "."]
         im = [H.img [H.src (img_r_fn sz i)]]
@@ -223,7 +234,7 @@ mk_ix :: State -> String
 mk_ix st =
     let is = zip [0..] (st_img_set st)
         sz = read (st_opt_lookup st "ix:image-size" "150")
-        cn = map (\(n,(k,_)) -> mk_img_div sz ["ix",img_id n] (k,Nothing)) is
+        cn = map (\(n,(k,_,_)) -> mk_img_div sz ["ix",img_id n] (k,Nothing)) is
     in mk_frame st "ix" [div_c "meta_ix" cn]
 
 proc_resize :: IO ()
@@ -232,6 +243,27 @@ proc_resize = do
   return ()
 
 -- * CSV
+
+group_on :: Eq x => (a -> x) -> [a] -> [[a]]
+group_on f = map (map snd) . groupBy ((==) `on` fst) . map (\x -> (f x,x))
+
+collate_on_adjacent :: (Eq k,Ord k) => (a -> k) -> (a -> v) -> [a] -> [(k,[v])]
+collate_on_adjacent f g =
+    let h l = case l of
+                [] -> error "collate_on_adjacent"
+                l0:_ -> (f l0,map g l)
+    in map h . group_on f
+
+-- > load_image_data prj_dir
+load_image_data :: FilePath -> IO Image_Group
+load_image_data dir = do
+  let csv_fn = dir </> "data/csv/images.csv"
+  str <- W.read_file_utf8 csv_fn
+  let p = C.parseDSV False ',' str
+      r = C.fromCSVTable (C.csvTable p)
+      f [s,fn,nm,opt] = (s,(fn,nm,opt))
+      f _ = error "load_image_data"
+  return (collate_on_adjacent fst snd (map f r))
 
 {-
 > import Data.List
