@@ -230,3 +230,12 @@ proc_resize :: IO ()
 proc_resize = do
   _ <- rawSystem "sh" ["sh/resize.sh","data/jpeg"]
   return ()
+
+-- * CSV
+
+{-
+> import Data.List
+> img <- load_image_group prj_dir
+> let f (n,l) = map (\(fn,nm) -> intercalate ";" [show n,fn,nm,"nil"]) l
+> putStrLn$unlines$concatMap f (zip [0..] img)
+-}
