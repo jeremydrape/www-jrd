@@ -13,25 +13,17 @@ e_config =
              ,E.cfg_url = "http://jeremydrape.com"
              ,E.cfg_pwd = Nothing}
 
-mk_front_ss :: J.State -> W.Result
-mk_front_ss st = W.utf8_html_output (J.mk_slideshow st)
-
 dispatch :: J.State -> W.Parameters -> W.Result
-dispatch (opt,md,img_set,_) (m,p,q) =
+dispatch st (m,p,q) =
     let s_ix = W.q_default "s" "" q
         i_ix = W.q_default "x" "" q
-        st = (opt,md,img_set,(s_ix,i_ix))
+        st' = st {J.st_ix = (s_ix,i_ix)}
         q' = W.q_remkeys ["s","x"] q
     in case (m,p,q') of
          ("GET",_,[("e",d)]) -> E.edit_get d
          ("POST",_,[("e",_)]) -> E.edit_post e_config ""
-{-
-         ("GET",_,[("i",i)]) ->
-           case J.img_lookup_by_name i img_set of
-             Nothing -> mk_front_ss st
-             Just img -> W.utf8_html_output (J.mk_img (opt,md,img_set,(J.img_file img,J.img_ix1 img)) (i,J.img_title img))
--}
-         ("GET",_,[("m","ix")]) -> W.utf8_html_output (J.mk_ix st)
+         ("GET",_,[("i",i)]) -> W.utf8_html_output (J.mk_slideshow st' (J.st_img_select_by_file i st'))
+         ("GET",_,[("m","ix")]) -> W.utf8_html_output (J.mk_ix st')
          ("GET",_,[("m","resize")]) ->
            C.liftIO J.proc_resize >>
            W.utf8_text_output "jrd: m=resize"
@@ -40,38 +32,9 @@ dispatch (opt,md,img_set,_) (m,p,q) =
            do r <- E.upload_post e_config
               C.liftIO J.proc_resize
               return r
-         ("GET",_,[("m",mt)]) -> W.utf8_html_output (J.mk_md st mt)
-         ("GET",_,[]) -> mk_front_ss st
+         ("GET",_,[("t",mt)]) -> W.utf8_html_output (J.mk_md st' mt)
+         ("GET",_,[]) -> W.utf8_html_output (J.mk_slideshow st' (J.st_img_select_by_ix st'))
          _ -> W.utf8_text_output ("jrd: dispatch error: " ++ show (m,p,q'))
 
 main :: IO ()
 main = J.load_st "." >>= \st -> W.run_cgi st dispatch
-
-{-
-import qualified Control.Monad.Random as R {- MonadRandom -}
-import qualified System.Random.Shuffle as R {- random-shuffle -}
-
-scramble :: [a] -> IO [a]
-scramble k = R.evalRandIO (R.shuffleM k)
-
--- | If unset or empty scramble entire image set, else select first
--- image and store remainder.  This is rather fragile...
-choose_image :: J.State -> C.CGI J.Image
-choose_image st = do
-  let im = J.st_img_set st
-      k = length im
-      scr = C.liftIO (scramble [0 .. k - 1])
-  c <- C.getCookie "n"
-  n0:n <- case c of
-            Nothing -> scr
-            Just s -> case words s of
-                        [] -> scr
-                        r -> return (map read r)
-  _ <- C.setCookie (C.newCookie "n" (unwords (map show n)))
-  return (im !! n0)
-
-mk_front :: J.State -> W.Result
-mk_front st = do
-  (nm,tt) <- choose_image st
-  W.utf8_html_output (J.mk_img st (nm,tt))
--}

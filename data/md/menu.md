@@ -9,7 +9,7 @@
 
 * * *
 
-- [Bio](./?m=about)
+- [Bio](./?t=about)
 - [Instagram](http://instagram.com/horse_hunting)
 - [Tumblr](http://jeremydrape.tumblr.com)
 - +61 476 240 046

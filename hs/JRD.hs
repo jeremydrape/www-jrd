@@ -15,12 +15,6 @@ import qualified WWW.Minus.IO as W {- www-minus -}
 
 -- * UTIL
 
-div_c :: String -> [H.Content] -> H.Content
-div_c c = H.div [H.class' c]
-
-html_en :: [H.Content] -> H.Element
-html_en = H.html [H.lang "en"]
-
 md_to_html :: String -> String
 md_to_html s =
     let s' = M.readMarkdown M.defaultParserState (s ++ "\n")
@@ -31,9 +25,6 @@ md_to_html s =
 prj_dir :: FilePath
 prj_dir = "/home/rohan/ut/www-jrd/"
 
-prj_img_fn :: FilePath -> FilePath
-prj_img_fn nm = "data/jpeg" </> nm <.> "jpeg"
-
 img_r_fn :: Int -> FilePath -> FilePath
 img_r_fn sz nm = "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
 
@@ -42,7 +33,6 @@ md_fn nm = "data/md" </> nm <.> "md"
 
 -- * TYPES
 
-type MD = [(String,String)]
 type Series_Ix = String
 type Image_File = String
 type Image_Title = String
@@ -53,11 +43,8 @@ data Image = Image {img_ix0 :: Series_Ix
                    ,img_z :: Image_Z
                    ,img_file :: Image_File
                    ,img_title :: Image_Title}
-type Opt = [(String,String)]
-type State = (Opt,MD,[Image],(Series_Ix,Image_Ix))
+             deriving (Eq,Show)
 
-opt_lookup :: Opt -> String -> String -> String
-opt_lookup o k def = fromMaybe def (lookup k o)
 
 -- | Give both set index and title.
 img_lookup_by_name :: Image_Title -> [Image] -> Maybe Image
@@ -66,13 +53,35 @@ img_lookup_by_name nm = find ((==) nm . img_title)
 img_sort_by_z :: [Image] -> [Image]
 img_sort_by_z = sortBy (compare `on` img_z)
 
-st_opt_lookup :: State -> String -> String -> String
-st_opt_lookup (o,_,_,_) = opt_lookup o
+type Opt = [(String,String)]
 
-st_img_set :: State -> [Image]
-st_img_set (_,_,img_set,(s_ix,i_ix)) =
-    let f img = img_ix0 img == s_ix || img_ix1 img == i_ix
-    in filter f img_set
+opt_lookup :: Opt -> String -> String -> String
+opt_lookup o k def = fromMaybe def (lookup k o)
+
+-- * State
+
+type MD = [(String,String)]
+data State = State {st_opt :: Opt
+                   ,st_md :: MD
+                   ,st_img_set :: [Image]
+                   ,st_ix :: (Series_Ix,Image_Ix)}
+             deriving (Eq,Show)
+
+st_opt_lookup :: State -> String -> String -> String
+st_opt_lookup = opt_lookup . st_opt
+
+st_img_select_by_ix :: State -> [Image]
+st_img_select_by_ix st =
+    let (s_ix,i_ix) = st_ix st
+        f img = img_ix0 img == s_ix || img_ix1 img == i_ix
+    in filter f (st_img_set st)
+
+-- > st <- load_st prj_dir
+-- > st_img_filter_by_file "DD_" st
+st_img_select_by_file :: String -> State -> [Image]
+st_img_select_by_file nm st =
+    let f img = nm `isInfixOf` img_file img
+    in filter f (st_img_set st)
 
 -- * IO
 
@@ -93,7 +102,7 @@ load_st dir = do
   opt <- load_opt_set dir
   images <- load_image_data dir
   md <- load_md dir ["menu","about"]
-  return (opt,md,images,("",""))
+  return (State opt md images ("",""))
 
 -- * SLIDESHOW
 
@@ -144,10 +153,9 @@ slideshow_post =
 -- > img <- load_image_group prj_dir
 -- > md <- load_md prj_dir ["menu"]
 -- > writeFile (prj_dir </> "ss.html") (mk_slideshow md img)
-mk_slideshow :: State -> String
-mk_slideshow st =
-    let is = st_img_set st
-        addr k = case st_opt_lookup st "image-url" "true" of
+mk_slideshow :: State -> [Image] -> String
+mk_slideshow st is =
+    let addr k = case st_opt_lookup st "image-url" "true" of
                    "false" -> Nothing
                    _ -> Just (H.mk_attr "data-cycle-hash" k)
         f img = H.img ([H.class' "next"
@@ -174,25 +182,25 @@ jrd_meta _ =
     ]
 
 menu_html :: State -> H.Content
-menu_html (_,md,_,_) =
-    case lookup "menu" md of
-      Just m -> div_c "menu" [H.cdata_raw (md_to_html m)]
-      _ -> div_c "menu" [H.cdata_raw "no menu?"]
+menu_html st =
+    case lookup "menu" (st_md st) of
+      Just m -> H.div_c "menu" [H.cdata_raw (md_to_html m)]
+      _ -> H.div_c "menu" [H.cdata_raw "no menu?"]
 
 mk_frame :: State -> String -> [H.Content] -> String
 mk_frame st mt cn =
     let hd = H.head [] (jrd_meta mt)
-        bd = H.body [H.class' "image"] [div_c "main" (menu_html st : cn)]
-    in H.renderHTML5 (html_en [hd,bd])
+        bd = H.body [H.class' "image"] [H.div_c "main" (menu_html st : cn)]
+    in H.renderHTML5 (H.html_en [hd,bd])
 
 mk_md :: State -> String -> String
-mk_md (_,md,_,_) mt =
-    let c = case lookup mt md of
-              Just m -> div_c mt [H.cdata_raw (md_to_html m)]
-              _ -> div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst md))]
+mk_md st mt =
+    let c = case lookup mt (st_md st) of
+              Just m -> H.div_c mt [H.cdata_raw (md_to_html m)]
+              _ -> H.div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst (st_md st)))]
         hd = H.head [] (jrd_meta mt)
-        bd = H.body [H.class' mt] [div_c "main" [c]]
-    in H.renderHTML5 (html_en [hd,bd])
+        bd = H.body [H.class' mt] [H.div_c "main" [c]]
+    in H.renderHTML5 (H.html_en [hd,bd])
 
 mk_img_div :: Int -> [String] -> (String,Maybe String) -> H.Content
 mk_img_div sz cl (i,t) =
@@ -200,8 +208,8 @@ mk_img_div sz cl (i,t) =
         im = [H.img [H.src (img_r_fn sz i)]]
         bd = case t of
                Nothing -> [H.a ln im]
-               Just t' -> [H.a ln im,div_c "title" [H.cdata t']]
-    in div_c (unwords ("image" : "content" : cl)) bd
+               Just t' -> [H.a ln im,H.div_c "title" [H.cdata t']]
+    in H.div_c (unwords ("image" : "content" : cl)) bd
 
 mk_img :: State -> (String,String) -> String
 mk_img st (mt,nm) = mk_frame st mt [mk_img_div 500 ["std"] (mt,Just nm)]
@@ -211,10 +219,10 @@ img_id n = printf "img_%04d" n
 
 mk_ix :: State -> String
 mk_ix st =
-    let is = zip [0..] (img_sort_by_z (st_img_set st))
+    let is = zip [0..] (img_sort_by_z (st_img_select_by_ix st))
         sz = read (st_opt_lookup st "ix:image-size" "150")
         cn = map (\(n,img) -> mk_img_div sz ["ix",img_id n] (img_file img,Nothing)) is
-    in mk_frame st "ix" [div_c "meta_ix" cn]
+    in mk_frame st "ix" [H.div_c "meta_ix" cn]
 
 proc_resize :: IO ()
 proc_resize = do
