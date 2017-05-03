@@ -31,8 +31,8 @@ md_to_html s =
 prj_dir :: FilePath
 prj_dir = "/home/rohan/ut/www-jrd/"
 
-img_fn :: FilePath -> FilePath
-img_fn nm = "data/jpeg" </> nm <.> "jpeg"
+prj_img_fn :: FilePath -> FilePath
+prj_img_fn nm = "data/jpeg" </> nm <.> "jpeg"
 
 img_r_fn :: Int -> FilePath -> FilePath
 img_r_fn sz nm = "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
@@ -44,11 +44,15 @@ md_fn nm = "data/md" </> nm <.> "md"
 
 type MD = [(String,String)]
 type Series_Ix = String
-type Image_Name = String
+type Image_File = String
 type Image_Title = String
 type Image_Ix = String
 type Image_Z = Int
-type Image = (Series_Ix,Image_Name,Image_Title,Image_Ix,Image_Z)
+data Image = Image {img_ix0 :: Series_Ix
+                   ,img_ix1 :: Image_Ix
+                   ,img_z :: Image_Z
+                   ,img_file :: Image_File
+                   ,img_title :: Image_Title}
 type Opt = [(String,String)]
 type State = (Opt,MD,[Image],(Series_Ix,Image_Ix))
 
@@ -56,13 +60,8 @@ opt_lookup :: Opt -> String -> String -> String
 opt_lookup o k def = fromMaybe def (lookup k o)
 
 -- | Give both set index and title.
-img_lookup_by_name :: Image_Name -> [Image] -> Maybe Image
-img_lookup_by_name nm =
-    let f (_,nm',_,_,_) = nm == nm'
-    in find f
-
-img_z :: Image -> Int
-img_z (_,_,_,_,z) = z
+img_lookup_by_name :: Image_Title -> [Image] -> Maybe Image
+img_lookup_by_name nm = find ((==) nm . img_title)
 
 img_sort_by_z :: [Image] -> [Image]
 img_sort_by_z = sortBy (compare `on` img_z)
@@ -71,19 +70,9 @@ st_opt_lookup :: State -> String -> String -> String
 st_opt_lookup (o,_,_,_) = opt_lookup o
 
 st_img_set :: State -> [Image]
-st_img_set (_,_,img,(s_ix,i_ix)) =
-    let f (s_ix',_,_,i_ix',_) = s_ix == s_ix' || i_ix == i_ix'
-    in filter f img
-
-{-
-import Data.List {- base -}
-
-st_img_title :: State -> Image_Name -> Maybe Image_Title
-st_img_title (_,_,is) k = lookup k is
-
-st_img_lookup :: State -> Image_Name -> Maybe Image
-st_img_lookup (_,_,is) k = find ((== k) . fst) is
--}
+st_img_set (_,_,img_set,(s_ix,i_ix)) =
+    let f img = img_ix0 img == s_ix || img_ix1 img == i_ix
+    in filter f img_set
 
 -- * IO
 
@@ -161,11 +150,11 @@ mk_slideshow st =
         addr k = case st_opt_lookup st "image-url" "true" of
                    "false" -> Nothing
                    _ -> Just (H.mk_attr "data-cycle-hash" k)
-        f (_,k,nm,_,_) = H.img ([H.class' "next"
-                                ,H.alt k
-                                ,H.src (img_r_fn 500 k)
-                                ,H.mk_attr "data-cycle-title" nm] ++
-                                catMaybes [addr k])
+        f img = H.img ([H.class' "next"
+                       ,H.alt (img_file img)
+                       ,H.src (img_r_fn 500 (img_file img))
+                       ,H.mk_attr "data-cycle-title" (img_title img)] ++
+                       catMaybes [addr (img_file img)])
         pkg s = unlines (concat [slideshow_pre st,s,slideshow_post])
         gen = pkg . map (H.showHTML5 . f)
     in gen is
@@ -224,7 +213,7 @@ mk_ix :: State -> String
 mk_ix st =
     let is = zip [0..] (img_sort_by_z (st_img_set st))
         sz = read (st_opt_lookup st "ix:image-size" "150")
-        cn = map (\(n,(_,k,_,_,_)) -> mk_img_div sz ["ix",img_id n] (k,Nothing)) is
+        cn = map (\(n,img) -> mk_img_div sz ["ix",img_id n] (img_file img,Nothing)) is
     in mk_frame st "ix" [div_c "meta_ix" cn]
 
 proc_resize :: IO ()
@@ -241,7 +230,7 @@ load_image_data dir = do
   str <- W.read_file_utf8 csv_fn
   let p = C.parseDSV False ',' str
       r = C.fromCSVTable (C.csvTable p)
-      f [s,fn,nm,opt,z] = (s,fn,nm,opt,read z)
+      f [s_ix,i_ix,z,fn,nm] = Image s_ix i_ix (read z) fn nm
       f _ = error "load_image_data"
   return (map f r)
 

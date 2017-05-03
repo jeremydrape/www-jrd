@@ -25,10 +25,12 @@ dispatch (opt,md,img_set,_) (m,p,q) =
     in case (m,p,q') of
          ("GET",_,[("e",d)]) -> E.edit_get d
          ("POST",_,[("e",_)]) -> E.edit_post e_config ""
+{-
          ("GET",_,[("i",i)]) ->
            case J.img_lookup_by_name i img_set of
              Nothing -> mk_front_ss st
-             Just (_,n,t,x,_z) -> W.utf8_html_output (J.mk_img (opt,md,img_set,(n,x)) (i,t))
+             Just img -> W.utf8_html_output (J.mk_img (opt,md,img_set,(J.img_file img,J.img_ix1 img)) (i,J.img_title img))
+-}
          ("GET",_,[("m","ix")]) -> W.utf8_html_output (J.mk_ix st)
          ("GET",_,[("m","resize")]) ->
            C.liftIO J.proc_resize >>
