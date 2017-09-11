@@ -1,22 +1,4 @@
 www-jrd
 -------
 
-[jrd][jrd] www
-
-[jrd]: http://jeremydrape.com/
-
-directory structure:
-
------------------- ---------------------------------------
-css                css files
-hs                 haskell code (current)
-hs/jrd-f           haskell code (obsolete)
-scm                scheme code (obsolete)
------------------- ---------------------------------------
-
-requirements:
-
-- [ghc](http://haskell.org/ghc/)
-- [html-minimalist](http://rd.slavepianos.org/?t=html-minimalist)
-- [xml](http://hackage.haskell.org/package/xml)
-- [tagsoup](http://hackage.haskell.org/package/tagsoup)
+[jrd](http://jeremydrape.com/) www
