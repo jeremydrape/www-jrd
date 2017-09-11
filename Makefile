@@ -22,10 +22,11 @@ add-remote-sp:
 	git remote add sp ssh://rd@slavepianos.org/~rd/ut/www-jrd.git
 
 remote-update:
-	ssh rd@slavepianos.org "(cd ut/www-jrd; make pull-jrd)"
+	ssh rd@slavepianos.org "(cd ut/www-jrd; git pull ../www-jrd.git)"
 
 remote-update-jrd:
 	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;make pull-sp-http;make all)"
 
 remote-commit-jrd:
 	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;git commit -a -m `date +%F/%T`; git push ../www-jrd.git master)"
+	ssh rd@slavepianos.org "(cd ut/www-jrd; make pull-jrd)"
