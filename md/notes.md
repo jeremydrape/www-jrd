@@ -74,3 +74,17 @@ multiple files.
 
 - [?i=DD_36](http://jeremydrape.com/?i=DD_36)
 - [?i=DD_](http://jeremydrape.com/?i=DD_)
+
+# directory structure
+
+------------------ ---------------------------------------
+css                css files
+data               data files (csv,hs,jpeg,md)
+error              http error code files
+hs/*.hs            haskell code (current)
+hs/jrd-f           obsolete (haskell code)
+o                  obsolete (previous design)
+scm                obsolete (scheme code)
+sh                 shell scripts
+theindex           obsolete
+------------------ ---------------------------------------
