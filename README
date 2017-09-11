@@ -1,9 +1,8 @@
 www-jrd
 -------
 
-[jrd][jrd] www
+[jrd](http://jeremydrape.com/) www
 
-[jrd]: http://jeremydrape.com/
 
 directory structure:
 
@@ -17,6 +16,6 @@ scm                scheme code (obsolete)
 requirements:
 
 - [ghc](http://haskell.org/ghc/)
-- [html-minimalist](http://rd.slavepianos.org/?t=html-minimalist)
+- [html-minus](http://rd.slavepianos.org/?t=html-minus)
 - [xml](http://hackage.haskell.org/package/xml)
 - [tagsoup](http://hackage.haskell.org/package/tagsoup)
