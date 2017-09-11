@@ -73,7 +73,7 @@ be an exact match to select one file, or a partial match to select
 multiple files.
 
 - [?i=DD_36](http://jeremydrape.com/?i=DD_36)
-- [?i=DD_](http://jeremydrape.com/?i=DD_)
+- [?i=DD](http://jeremydrape.com/?i=DD)
 
 # directory structure
 
