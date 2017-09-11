@@ -2,4 +2,4 @@
 ,("paused","true")
 ,("swipe","true")
 ,("image-url","false")
-,("ix:image-size","250")]
+,("ix:image-size","350")]
