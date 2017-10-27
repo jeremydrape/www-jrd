@@ -1,6 +1,7 @@
 all:
 	(cd hs; make all)
 	(cd data/jpeg; make all)
+	(rm -f cmark ; ln -s ~/opt/bin/cmark .)
 
 clean:
 	(cd hs; make clean)
