@@ -10,15 +10,8 @@ import Text.Printf {- base -}
 import qualified Text.CSV.Lazy.String as C {- lazy-csv -}
 
 import qualified Text.HTML.Minus as H {- html-minus -}
-import qualified Text.Pandoc.Minus as M {- pandoc-minus -}
-import qualified WWW.Minus.IO as W {- www-minus -}
-
--- * UTIL
-
-md_to_html :: String -> String
-md_to_html s =
-    let s' = M.readMarkdown M.defaultParserState (s ++ "\n")
-    in M.writeHtmlString M.defaultWriterOptions s'
+import qualified WWW.Minus.MD as MD {- pandoc-minus -}
+import qualified WWW.Minus.IO as IO {- www-minus -}
 
 -- * PATHS
 
@@ -60,9 +53,9 @@ opt_lookup o k def = fromMaybe def (lookup k o)
 
 -- * State
 
-type MD = [(String,String)]
+type HTML = [(String,String)]
 data State = State {st_opt :: Opt
-                   ,st_md :: MD
+                   ,st_html :: HTML
                    ,st_img_set :: [Image]
                    ,st_ix :: (Series_Ix,Image_Ix)}
              deriving (Eq,Show)
@@ -86,23 +79,24 @@ st_img_select_by_file nm st =
 -- * IO
 
 -- > md <- load_md prj_dir ["menu","about"]
-load_md :: FilePath -> [String] -> IO MD
+load_md :: FilePath -> [String] -> IO HTML
 load_md dir ps = do
-  let f p = W.read_file_utf8 (dir </> md_fn p)
+  let f p = IO.read_file_utf8 (dir </> md_fn p)
   ms <- mapM f ps
-  return (zip ps ms)
+  hs <- mapM MD.md_to_html ms
+  return (zip ps hs)
 
 load_opt_set :: FilePath -> IO Opt
 load_opt_set dir = do
   let fn = dir </> "data/hs/opt.hs"
-  fmap read (W.read_file_utf8 fn)
+  fmap read (IO.read_file_utf8 fn)
 
 load_st :: FilePath -> IO State
 load_st dir = do
   opt <- load_opt_set dir
   images <- load_image_data dir
-  md <- load_md dir ["menu","about"]
-  return (State opt md images ("",""))
+  html <- load_md dir ["menu","about"]
+  return (State opt html images ("",""))
 
 -- * SLIDESHOW
 
@@ -158,7 +152,7 @@ mk_slideshow st is =
     let addr k = case st_opt_lookup st "image-url" "true" of
                    "false" -> Nothing
                    _ -> Just (H.mk_attr "data-cycle-hash" k)
-        f img = H.img ([H.class' "next"
+        f img = H.img ([H.class_attr "next"
                        ,H.alt (img_file img)
                        ,H.src (img_r_fn 500 (img_file img))
                        ,H.mk_attr "data-cycle-title" (img_title img)] ++
@@ -183,23 +177,23 @@ jrd_meta _ =
 
 menu_html :: State -> H.Content
 menu_html st =
-    case lookup "menu" (st_md st) of
-      Just m -> H.div_c "menu" [H.cdata_raw (md_to_html m)]
+    case lookup "menu" (st_html st) of
+      Just h -> H.div_c "menu" [H.cdata_raw h]
       _ -> H.div_c "menu" [H.cdata_raw "no menu?"]
 
 mk_frame :: State -> String -> [H.Content] -> String
 mk_frame st mt cn =
     let hd = H.head [] (jrd_meta mt)
-        bd = H.body [H.class' "image"] [H.div_c "main" (menu_html st : cn)]
+        bd = H.body [H.class_attr "image"] [H.div_c "main" (menu_html st : cn)]
     in H.renderHTML5 (H.html_en [hd,bd])
 
 mk_md :: State -> String -> String
 mk_md st mt =
-    let c = case lookup mt (st_md st) of
-              Just m -> H.div_c mt [H.cdata_raw (md_to_html m)]
-              _ -> H.div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst (st_md st)))]
+    let c = case lookup mt (st_html st) of
+              Just h -> H.div_c mt [H.cdata_raw h]
+              _ -> H.div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst (st_html st)))]
         hd = H.head [] (jrd_meta mt)
-        bd = H.body [H.class' mt] [H.div_c "main" [c]]
+        bd = H.body [H.class_attr mt] [H.div_c "main" [c]]
     in H.renderHTML5 (H.html_en [hd,bd])
 
 mk_img_div :: Int -> [String] -> (String,Maybe String) -> H.Content
@@ -235,7 +229,7 @@ proc_resize = do
 load_image_data :: FilePath -> IO [Image]
 load_image_data dir = do
   let csv_fn = dir </> "data/csv/images.csv"
-  str <- W.read_file_utf8 csv_fn
+  str <- IO.read_file_utf8 csv_fn
   let p = C.parseDSV False ',' str
       r = C.fromCSVTable (C.csvTable p)
       f [s_ix,i_ix,z,fn,nm] = Image s_ix i_ix (read z) fn nm
