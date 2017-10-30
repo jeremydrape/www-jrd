@@ -83,7 +83,7 @@ load_md :: FilePath -> [String] -> IO HTML
 load_md dir ps = do
   let f p = IO.read_file_utf8 (dir </> md_fn p)
   ms <- mapM f ps
-  hs <- mapM MD.md_to_html ms
+  hs <- mapM (MD.md_to_html "bin") ms
   return (zip ps hs)
 
 load_opt_set :: FilePath -> IO Opt
