@@ -7,6 +7,11 @@ clean:
 	(cd hs; make clean)
 	(cd data/jpeg; make clean)
 
+setup-editor:
+	mkdir -p e
+	rm -f e/index.cgi
+	cp $(HOME)/sw/www-minus/py/editor.py e/index.cgi
+
 push-sp:
 	git push ssh://rd@slavepianos.org/~rd/ut/www-jrd.git master
 
