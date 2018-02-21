@@ -77,7 +77,7 @@ multiple files.
 
 # directory structure
 
------------------- ---------------------------------------
+~~~~
 css                css files
 data               data files (csv,hs,jpeg,md)
 error              http error code files
@@ -87,4 +87,4 @@ o                  obsolete (previous design)
 scm                obsolete (scheme code)
 sh                 shell scripts
 theindex           obsolete
------------------- ---------------------------------------
+~~~~
