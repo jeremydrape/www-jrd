@@ -1,8 +1,8 @@
 <div class="jeremy_drape">JEREMY DRAPE</div>
 
-- [Photographs](./?x=z)
-<!-- - [London](./?s=1)
-- [The Carrier](./?s=2)
+- [The Carrier](./?s=2&m=ix)
+- [London](./?s=1&m=ix)
+<!-- - [The Carrier](./?s=2)
 - [Inside the Mountain](./?s=3)
 - [REMAINDER](./?s=-) -->
 - [](./)
