@@ -2,6 +2,7 @@ all:
 	(cd hs; make all)
 	(cd data/jpeg; make all)
 	(rm -f bin/cmark ; mkdir -p bin ; ln -s ~/opt/bin/cmark bin/cmark)
+	(make setup-editor)
 
 clean:
 	(cd hs; make clean)
