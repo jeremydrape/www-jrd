@@ -9,9 +9,10 @@ clean:
 	(cd data/jpeg; make clean)
 
 setup-editor:
-	mkdir -p e
-	rm -f e/index.cgi
+	mkdir -p e u
+	rm -f e/index.cgi u/index.cgi
 	cp $(HOME)/sw/www-minus/py/editor.py e/index.cgi
+	cp $(HOME)/sw/www-minus/py/upload.py u/index.cgi
 
 push-sp:
 	git push ssh://rd@slavepianos.org/~rd/ut/www-jrd.git master
