@@ -1,7 +1,7 @@
 <div class="jeremy_drape">JEREMY DRAPE</div>
 
 - [The Carrier](./?s=2)
-- [London](./?s=1&m=ix)
+- [London](./?s=1)
 <!-- - [The Carrier](./?s=2)
 - [Inside the Mountain](./?s=3)
 - [The Savage Sea](./?s=4&m=ix)
