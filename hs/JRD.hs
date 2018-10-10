@@ -185,7 +185,7 @@ mk_frame :: State -> String -> [H.Content] -> String
 mk_frame st mt cn =
     let hd = H.head [] (jrd_meta mt)
         bd = H.body [H.class_attr "image"] [H.div_c "main" (menu_html st : cn)]
-    in H.renderHTML5 (H.html_en [hd,bd])
+    in H.renderHTML5_pp (H.html_en [hd,bd])
 
 mk_md :: State -> String -> String
 mk_md st mt =
@@ -194,7 +194,7 @@ mk_md st mt =
               _ -> H.div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst (st_html st)))]
         hd = H.head [] (jrd_meta mt)
         bd = H.body [H.class_attr mt] [H.div_c "main" [c]]
-    in H.renderHTML5 (H.html_en [hd,bd])
+    in H.renderHTML5_pp (H.html_en [hd,bd])
 
 mk_img_div :: Int -> [String] -> (String,Maybe String) -> H.Content
 mk_img_div sz cl (i,t) =

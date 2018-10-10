@@ -1,37 +1,44 @@
-all:
+mk-hs:
 	(cd hs; make all)
+
+mk-convert:
 	(cd data/jpeg; make all)
+
+mk-cmark:
 	(rm -f bin/cmark ; mkdir -p bin ; ln -s ~/opt/bin/cmark bin/cmark)
-	(make setup-editor)
 
-clean:
-	(cd hs; make clean)
-	(cd data/jpeg; make clean)
-
-setup-editor:
+mk-editor:
 	mkdir -p e u
 	rm -f e/index.cgi u/index.cgi
 	cp $(HOME)/sw/www-minus/py/editor.py e/index.cgi
 	cp $(HOME)/sw/www-minus/py/upload.py u/index.cgi
 
-push-sp:
-	git push ssh://rd@slavepianos.org/~rd/ut/www-jrd.git master
 
-pull-sp:
-	git pull ssh://rd@slavepianos.org/~rd/ut/www-jrd.git master
+all:	mk-hs mk-convert mk-cmark mk-editor
 
-pull-sp-http:
-	git pull http://rd.slavepianos.org/ut/www-jrd.git/ master
+clean:
+	(cd hs; make clean)
+	(cd data/jpeg; make clean)
+
+push-rd:
+	git push ssh://rd@rohandrape.net/~rd/ut/www-jrd.git master
+
+pull-rd:
+	git pull ssh://rd@rohandrape.net/~rd/ut/www-jrd.git master
+
+pull-rd-http:
+	git pull http://rohandrape.net/ut/www-jrd.git/ master
 
 pull-jrd:
+	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com; git push ../www-jrd.git master)"
 	git pull http://jeremydrape.com/www-jrd.git/ master
 
 remote-update:
-	ssh rd@slavepianos.org "(cd ut/www-jrd; git pull ../www-jrd.git)"
+	ssh rd@rohandrape.net "(cd ut/www-jrd; git pull ../www-jrd.git)"
 
 remote-update-jrd:
-	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;make pull-sp-http;make all)"
+	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;make pull-rd-http;make all)"
 
 remote-commit-jrd:
-	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;git commit -a -m `date +%F/%T`; git push ../www-jrd.git master)"
-	make pull-jrd push-sp remote-update
+	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com;git commit -a -m `date +%F/%T`)"
+	make pull-jrd push-rd remote-update
