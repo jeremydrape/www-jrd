@@ -1,6 +1,8 @@
 ln-local:
-	rm -f Text WWW
-	ln -s $(HOME)/sw/html-minus/Text Text
+	rm -f Text/HTML Text/CSV WWW
+	mkdir -p Text
+	ln -s $(HOME)/sw/html-minus/Text/HTML Text/HTML
+	ln -s $(HOME)/opt/src/lazy-csv-0.5.1/Text/CSV Text/CSV
 	ln -s $(HOME)/sw/www-minus/WWW WWW
 
 mk-cgi:
