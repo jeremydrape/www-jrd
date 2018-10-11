@@ -17,7 +17,7 @@ do
             n=$(basename $i .$f)
             $verbose && echo "resize: $n"
             if ! test -f $d/$o/$n.jpeg
-            then convert -resize $t -colorspace rgb $i $d/$o/$n.jpeg
+            then convert -resize $t $i $d/$o/$n.jpeg
             else $verbose && echo "$d/$o/$n.jpeg exists"
             fi
         done
