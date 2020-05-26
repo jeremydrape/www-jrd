@@ -51,6 +51,9 @@ type Opt = [(String,String)]
 opt_lookup :: Opt -> String -> String -> String
 opt_lookup o k def = fromMaybe def (lookup k o)
 
+opt_lookup_read :: Read x => Opt -> String -> x -> x
+opt_lookup_read o k def = maybe def read (lookup k o)
+
 -- * State
 
 type HTML = [(String,String)]
@@ -62,6 +65,9 @@ data State = State {st_opt :: Opt
 
 st_opt_lookup :: State -> String -> String -> String
 st_opt_lookup = opt_lookup . st_opt
+
+st_opt_lookup_int :: State -> String -> Int -> Int
+st_opt_lookup_int = opt_lookup_read . st_opt
 
 st_img_select_by_ix :: State -> [Image]
 st_img_select_by_ix st =
@@ -149,17 +155,16 @@ slideshow_post =
 -- > writeFile (prj_dir </> "ss.html") (mk_slideshow md img)
 mk_slideshow :: State -> [Image] -> String
 mk_slideshow st is =
-    let addr k = case st_opt_lookup st "image-url" "true" of
-                   "false" -> Nothing
-                   _ -> Just (H.mk_attr "data-cycle-hash" k)
-        f img = H.img ([H.class_attr "next"
-                       ,H.alt (img_file img)
-                       ,H.src (img_r_fn 500 (img_file img))
-                       ,H.mk_attr "data-cycle-title" (img_title img)] ++
-                       catMaybes [addr (img_file img)])
-        pkg s = unlines (concat [slideshow_pre st,s,slideshow_post])
-        gen = pkg . map (H.showHTML5 . f)
-    in gen is
+  let addr k = case st_opt_lookup st "image-url" "true" of
+                 "false" -> Nothing
+                 _ -> Just (H.mk_attr "data-cycle-hash" k)
+      f img = H.img ([H.class_attr "next"
+                     ,H.alt (img_file img)
+                     ,H.src (img_r_fn (st_opt_lookup_int st "main:image-size" 1000) (img_file img))
+                     ,H.mk_attr "data-cycle-title" (img_title img)] ++ catMaybes [addr (img_file img)])
+      pkg s = unlines (concat [slideshow_pre st,s,slideshow_post])
+      gen = pkg . map (H.showHTML5 . f)
+  in gen is
 
 -- * HTML
 
@@ -214,7 +219,7 @@ img_id n = printf "img_%04d" n
 mk_ix :: State -> String
 mk_ix st =
     let is = zip [0..] (img_sort_by_z (st_img_select_by_ix st))
-        sz = read (st_opt_lookup st "ix:image-size" "150")
+        sz = read (st_opt_lookup st "ix:image-size" "350")
         cn = map (\(n,img) -> mk_img_div sz ["ix",img_id n] (img_file img,Nothing)) is
     in mk_frame st "ix" [H.div_c "meta_ix" cn]
 
