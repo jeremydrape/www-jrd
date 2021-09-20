@@ -35,7 +35,8 @@ hr {display: none}
 div.menu {background-color: transparent}
 div.menu a {text-decoration: none}
 div.about, div.content {
-    margin: 0 auto;
+    /*margin: 0 auto;*/
+    margin-left: 15%;
     padding: 1em 0;
     max-width: 55em;
     text-align: left;
