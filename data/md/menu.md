@@ -13,13 +13,10 @@
 - [](./)
 
 * * *
--->
-
-<!--
-![](data/jpeg/Headstone.jpeg)
 
 - [Instagram](http://instagram.com/horse_hunting)
 - +61 476 240 046
 
-<div class="title" id="caption"></div
 -->
+
+<div class="title" id="caption"></div>
