@@ -1,4 +1,4 @@
-Jeremy Drape\
+[Jeremy Drape](https://jeremydrape.com/)\
 b. 1983\
 West Melbourne
 
