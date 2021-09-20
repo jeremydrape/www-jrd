@@ -117,7 +117,7 @@ slideshow_pre st =
     ,"<head>"
     ,concatMap H.showHTML5 (jrd_meta "")
     ,"<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js\"></script>"
-    ,"<script src=\"http://malsup.github.io/min/jquery.cycle2.min.js\"></script>"
+    ,"<script src=\"https://malsup.github.io/min/jquery.cycle2.min.js\"></script>"
     ,"</head>"
     ,"<body>"
     ,"<div class=\"main\">"
