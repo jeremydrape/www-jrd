@@ -2,9 +2,9 @@
 
 `/e` is the `EDITOR`.
 
-- [/e/?t=../data/csv/images.csv](http://jeremydrape.com/e/?t=../data/csv/images.csv)
-- [/e/?t=../data/hs/opt.hs](http://jeremydrape.com/e/?t=../data/hs/opt.hs)
-- [/e/?t=../data/md/menu.md](http://jeremydrape.com/e/?t=../data/md/menu.md)
+- [/e/?t=data/csv/images.csv](http://jeremydrape.com/e/?t=data/csv/images.csv)
+- [/e/?t=data/hs/opt.hs](http://jeremydrape.com/e/?t=data/hs/opt.hs)
+- [/e/?t=data/md/menu.md](http://jeremydrape.com/e/?t=data/md/menu.md)
 
 # selectors
 
@@ -27,13 +27,13 @@
 
 # options
 
-- [/e/?t=../data/hs/opt.hs](http://jeremydrape.com/e/?t=../data/hs/opt.hs)
+- [/e/?t=data/hs/opt.hs](http://jeremydrape.com/e/?t=data/hs/opt.hs)
 
 `ix:image-size` is the image size (height in pixels) for the `m=ix` mode, allowed values are: 150, 250, 350, 500.
 
 # data
 
-- [/e/?t=../data/csv/images.csv](http://jeremydrape.com/e/?t=../data/csv/images.csv)
+- [/e/?t=data/csv/images.csv](http://jeremydrape.com/e/?t=data/csv/images.csv)
 
 The columns are:
 
