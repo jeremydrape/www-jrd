@@ -10,7 +10,7 @@ import Text.Printf {- base -}
 import qualified Text.CSV.Lazy.String as C {- lazy-csv -}
 
 import qualified Text.HTML.Minus as H {- html-minus -}
-import qualified WWW.Minus.MD as MD {- pandoc-minus -}
+import qualified WWW.Minus.MD as MD {- www-minus -}
 import qualified WWW.Minus.IO as IO {- www-minus -}
 
 -- * PATHS
@@ -106,15 +106,18 @@ load_st dir = do
 
 -- * SLIDESHOW
 
+{- | Preamble
+
+     JQuery CDN: <https://developers.google.com/speed/libraries#jquery>
+-}
 slideshow_pre :: State -> [String]
 slideshow_pre st =
     ["<!DOCTYPE html>"
     ,"<html lang=\"en\">"
     ,"<head>"
     ,concatMap H.showHTML5 (jrd_meta "")
-    ,"<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js\"></script>"
-    ,"<script src=\"http://malsup.github.com/jquery.cycle2.js\"></script>"
-    ,"<script src=\"http://malsup.github.io/min/jquery.cycle2.swipe.min.js\"></script>"
+    ,"<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js\"></script>"
+    ,"<script src=\"http://malsup.github.io/min/jquery.cycle2.min.js\"></script>"
     ,"</head>"
     ,"<body>"
     ,"<div class=\"main\">"

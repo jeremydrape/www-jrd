@@ -26,7 +26,7 @@ e_config =
 
 dispatch :: J.State -> CGI.Parameters -> IO ()
 dispatch st (m,q) =
-    let s_ix = CGI.q_default "s" "" q
+    let s_ix = CGI.q_default "s" "_" q -- "_" is home
         i_ix = CGI.q_default "x" "" q
         st' = st {J.st_ix = (s_ix,i_ix)}
         q' = CGI.q_remkeys ["s","x"] q
