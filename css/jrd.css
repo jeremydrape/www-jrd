@@ -34,15 +34,15 @@ hr {display: none}
 /* class */
 div.menu {background-color: transparent}
 div.menu a {text-decoration: none}
-div.about, div.content {
-    /*margin: 0 auto;*/
-    margin-left: 15%;
+div.content {
+    margin: 0 auto;
     padding: 1em 0;
     max-width: 55em;
     text-align: left;
     background-color: transparent;
 }
 div.content {padding-left: 50px}
+div.about {margin-left: 15%}
 div.cycle-slideshow {text-align: center}
 div.jeremy_drape {font-family: "Helvetica",sans-serif}
 div.jeremy_drape {font-weight: bold}
