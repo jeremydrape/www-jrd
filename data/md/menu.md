@@ -1,5 +1,5 @@
 <div class="jeremy_drape">
-<a href="./index.cgi?t=about">JEREMY DRAPE</a>
+<a href="./?t=about">JEREMY DRAPE</a>
 </div>
 
 <!--
