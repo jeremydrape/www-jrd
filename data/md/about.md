@@ -30,7 +30,7 @@ Clip Award\
 2017
 
 Tempo (Solo Exhibition)\
-[Schoolhouse Studios](https://www.schoolhousestudios.com.au/), Collingwood\
+[Schoolhouse Studios](https://www.schoolhousestudios.com.au/)\
 2015
 
 Team Australia (Group Exhibition)\
@@ -38,11 +38,11 @@ Carlton Hotel, Melbourne\
 2008
 
 Polar (Group Exhibition)\
-[Margaret Lawrence Gallery](https://finearts-music.unimelb.edu.au/about-us/margaret-lawrence-gallery), Melbourne\
+[Margaret Lawrence Gallery](https://finearts-music.unimelb.edu.au/about-us/margaret-lawrence-gallery)\
 2007
 
 Always On My Mind (Group Exhibition)\
-[TCB Gallery](https://tcbartinc.org.au/), Melbourne\
+[TCB Gallery](https://tcbartinc.org.au/)\
 2007
 
 <!--
