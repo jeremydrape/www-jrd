@@ -42,7 +42,7 @@ Polar (Group Exhibition)\
 2007
 
 Always On My Mind (Group Exhibition)\
-TCB Gallery, Melbourne\
+[TCB Gallery](https://tcbartinc.org.au/), Melbourne\
 2007
 
 <!--
