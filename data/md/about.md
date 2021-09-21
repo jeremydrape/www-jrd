@@ -18,7 +18,7 @@ Clip Award\
 2020
 
 Olive Cotton Award\
-Tweed Regional Gallery\
+[Tweed Regional Gallery](https://artgallery.tweed.nsw.gov.au/PrizesAndAwards/OliveCotton)\
 2017
 
 Josephine Ulrick Win Schubert Photography Award\
