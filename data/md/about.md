@@ -38,7 +38,7 @@ Carlton Hotel, Melbourne\
 2008
 
 Polar (Group Exhibition)\
-Margaret Lawrence Gallery, Melbourne\
+[Margaret Lawrence Gallery](https://finearts-music.unimelb.edu.au/about-us/margaret-lawrence-gallery), Melbourne\
 2007
 
 Always On My Mind (Group Exhibition)\
