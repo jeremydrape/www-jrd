@@ -18,7 +18,7 @@ Clip Award\
 2020
 
 Olive Cotton Award\
-[Tweed Regional Gallery](https://artgallery.tweed.nsw.gov.au/PrizesAndAwards/OliveCotton)\
+Tweed Regional Gallery\
 2017
 
 Josephine Ulrick Win Schubert Photography Award\
@@ -26,7 +26,7 @@ Gold Coast City Gallery\
 2017
 
 Clip Award\
-Perth Centre for Contemporary Photography\
+[Perth Centre for Contemporary Photography](https://www.pcp.org.au/)\
 2017
 
 Tempo (Solo Exhibition)\
