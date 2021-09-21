@@ -30,7 +30,7 @@ Clip Award\
 2017
 
 Tempo (Solo Exhibition)\
-Schoolhouse Studios, Collingwood\
+[Schoolhouse Studios](https://www.schoolhousestudios.com.au/), Collingwood\
 2015
 
 Team Australia (Group Exhibition)\
