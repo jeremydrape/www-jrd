@@ -22,7 +22,7 @@ Olive Cotton Award\
 2017
 
 Josephine Ulrick Win Schubert Photography Award\
-Gold Coast City Gallery\
+[HOTA](https://hota.com.au/)\
 2017
 
 Clip Award\
