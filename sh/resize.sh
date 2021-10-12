@@ -2,6 +2,8 @@
 #
 # sh sh/resize.sh data/jpeg
 
+if test $# != 1 ; then echo "resize.sh image-directory" ; exit 1 ; fi
+
 d=$1
 verbose=false
 

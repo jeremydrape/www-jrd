@@ -13,7 +13,6 @@ mk-editor:
 	cp $(HOME)/sw/www-minus/py/upload.py upload.cgi
 	chmod 755 editor.cgi upload.cgi
 
-
 all:	mk-hs mk-convert mk-cmark mk-editor
 
 clean:
