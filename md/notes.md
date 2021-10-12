@@ -1,10 +1,11 @@
 # editor
 
-`/e` is the `EDITOR`.
+`editor.cgi` is the `EDITOR`.
 
-- [/e/?t=data/csv/images.csv](http://jeremydrape.com/e/?t=data/csv/images.csv)
-- [/e/?t=data/hs/opt.hs](http://jeremydrape.com/e/?t=data/hs/opt.hs)
-- [/e/?t=data/md/menu.md](http://jeremydrape.com/e/?t=data/md/menu.md)
+- <http://jeremydrape.com/editor.cgi?t=data/csv/images.csv>
+- <http://jeremydrape.com/editor.cgi?t=data/hs/opt.hs>
+- <http://jeremydrape.com/editor.cgi?t=data/md/menu.md>
+- <http://jeremydrape.com/editor.cgi?t=data/md/about.md>
 
 # selectors
 
