@@ -11,6 +11,7 @@ mk-editor:
 	rm -f editor.cgi upload.cgi
 	cp $(HOME)/sw/www-minus/py/editor.py editor.cgi
 	cp $(HOME)/sw/www-minus/py/upload.py upload.cgi
+	chmod 755 editor.cgi upload.cgi
 
 
 all:	mk-hs mk-convert mk-cmark mk-editor
