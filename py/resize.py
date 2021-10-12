@@ -6,6 +6,6 @@ print("Content-type: text/html\n\n")
 
 print("<p>Resizing images...</p>\n\n")
 
-subprocess.call(["sh","../sh/resize.sh","../data/jpeg"])
+result = subprocess.call(["sh","../sh/resize.sh","../data/jpeg"])
 
-print("<p>Resize complete</p>\n\n")
+print("<p>Resize complete, result = %(result)s (0 = success)</p>\n\n" % {'result': result})
