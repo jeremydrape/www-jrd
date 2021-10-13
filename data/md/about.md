@@ -9,8 +9,6 @@ contact@jeremydrape.com\
 Bachelor of Fine Arts (Honours)\
 Victorian College of the Arts
 
-<a href="https://jeremydrape.com/?s=9&m=ix" target="_blank">Commercial Portfolio</a><br />
-
 IRIS Award\
 [Perth Centre for Contemporary Photography](https://www.pcp.org.au/)\
 2021
