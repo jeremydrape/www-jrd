@@ -2,9 +2,9 @@ import Data.List {- base -}
 import System.Random {- random -}
 import Text.Printf {- base -}
 
-import qualified Sound.SC3.Lang.Random.Gen as L {- hsc3-lang -}
+import qualified Sound.Sc3.Lang.Random.Gen as L {- hsc3-lang -}
 
-import qualified JRD as J {- ut/www-jrd -}
+import qualified Jrd {- ut/www-jrd -}
 
 -- > take 4 $ img_offsets (400, 200)
 img_offsets :: (Int, Int) -> [[Int]]
@@ -22,7 +22,7 @@ mk_padding p =
       _ -> error "mk_padding?"
 
 img_id_rand_css :: Int -> [Int] -> String
-img_id_rand_css n p = printf "div.%s {%s}" (J.img_id n) (mk_padding p)
+img_id_rand_css n p = printf "div.%s {%s}" (Jrd.img_id n) (mk_padding p)
 
 gen :: IO ()
 gen = putStrLn $ unlines $ zipWith img_id_rand_css [0..200] (img_offsets (400, 200))

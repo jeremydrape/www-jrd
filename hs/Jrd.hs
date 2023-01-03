@@ -1,4 +1,4 @@
-module JRD where
+module Jrd where
 
 import Data.Function {- base -}
 import Data.List {- base -}
@@ -9,11 +9,11 @@ import Text.Printf {- base -}
 
 import qualified Text.CSV.Lazy.String as C {- lazy-csv -}
 
-import qualified Text.HTML.Minus as H {- html-minus -}
-import qualified WWW.Minus.MD as MD {- www-minus -}
-import qualified WWW.Minus.IO as IO {- www-minus -}
+import qualified Text.Html.Minus as H {- html-minus -}
+import qualified Www.Minus.Md as Md {- www-minus -}
+import qualified Www.Minus.Io as Io {- www-minus -}
 
--- * PATHS
+-- * Paths
 
 prj_dir :: FilePath
 prj_dir = "/home/rohan/ut/www-jrd/"
@@ -24,7 +24,7 @@ img_r_fn sz nm = "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
 md_fn :: FilePath -> FilePath
 md_fn nm = "data/md" </> nm <.> "md"
 
--- * TYPES
+-- * Types
 
 type Series_Ix = String
 type Image_File = String
@@ -56,9 +56,9 @@ opt_lookup_read o k def = maybe def read (lookup k o)
 
 -- * State
 
-type HTML = [(String,String)]
+type Html = [(String,String)]
 data State = State {st_opt :: Opt
-                   ,st_html :: HTML
+                   ,st_html :: Html
                    ,st_img_set :: [Image]
                    ,st_ix :: (Series_Ix,Image_Ix)}
              deriving (Eq,Show)
@@ -82,20 +82,20 @@ st_img_select_by_file nm st =
     let f img = nm `isInfixOf` img_file img
     in filter f (st_img_set st)
 
--- * IO
+-- * Io
 
 -- > md <- load_md prj_dir ["menu","about"]
-load_md :: FilePath -> [String] -> IO HTML
+load_md :: FilePath -> [String] -> IO Html
 load_md dir ps = do
-  let f p = IO.read_file_utf8 (dir </> md_fn p)
+  let f p = Io.read_file_utf8 (dir </> md_fn p)
   ms <- mapM f ps
-  hs <- mapM (MD.md_to_html "bin") ms
+  hs <- mapM (Md.md_to_html "bin") ms
   return (zip ps hs)
 
 load_opt_set :: FilePath -> IO Opt
 load_opt_set dir = do
   let fn = dir </> "data/hs/opt.hs"
-  fmap read (IO.read_file_utf8 fn)
+  fmap read (Io.read_file_utf8 fn)
 
 load_st :: FilePath -> IO State
 load_st dir = do
@@ -104,7 +104,7 @@ load_st dir = do
   html <- load_md dir ["menu","about"]
   return (State opt html images ("",""))
 
--- * SLIDESHOW
+-- * Slideshow
 
 {- | Preamble
 
@@ -115,13 +115,13 @@ slideshow_pre st =
     ["<!DOCTYPE html>"
     ,"<html lang=\"en\">"
     ,"<head>"
-    ,concatMap H.showHTML5 (jrd_meta "")
+    ,concatMap H.showHtml5 (jrd_meta "")
     ,"<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js\"></script>"
     ,"<script src=\"https://malsup.github.io/min/jquery.cycle2.min.js\"></script>"
     ,"</head>"
     ,"<body>"
     ,"<div class=\"main\">"
-    ,H.showHTML5 (menu_html st)
+    ,H.showHtml5 (menu_html st)
     ,"<div class=\"content\">"
     ,"<div class=\"cycle-slideshow\""
     ,"     data-cycle-fx=\"fadeout\""
@@ -166,10 +166,10 @@ mk_slideshow st is =
                      ,H.src (img_r_fn (st_opt_lookup_int st "main:image-size" 1000) (img_file img))
                      ,H.mk_attr "data-cycle-title" (img_title img)] ++ catMaybes [addr (img_file img)])
       pkg s = unlines (concat [slideshow_pre st,s,slideshow_post])
-      gen = pkg . map (H.showHTML5 . f)
+      gen = pkg . map (H.showHtml5 . f)
   in gen is
 
--- * HTML
+-- * Html
 
 jrd_meta :: String -> [H.Content]
 jrd_meta _ =
@@ -193,7 +193,7 @@ mk_frame :: State -> String -> [H.Content] -> String
 mk_frame st mt cn =
     let hd = H.head [] (jrd_meta mt)
         bd = H.body [H.class_attr "image"] [H.div_c "main" (menu_html st : cn)]
-    in H.renderHTML5_pp (H.html_en [hd,bd])
+    in H.renderHtml5_pp (H.html_en [hd,bd])
 
 mk_md :: State -> String -> String
 mk_md st mt =
@@ -202,7 +202,7 @@ mk_md st mt =
               _ -> H.div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst (st_html st)))]
         hd = H.head [] (jrd_meta mt)
         bd = H.body [H.class_attr mt] [H.div_c "main" [c]]
-    in H.renderHTML5_pp (H.html_en [hd,bd])
+    in H.renderHtml5_pp (H.html_en [hd,bd])
 
 mk_img_div :: Int -> [String] -> (String,Maybe String) -> H.Content
 mk_img_div sz cl (i,t) =
@@ -231,13 +231,13 @@ proc_resize = do
   _ <- rawSystem "sh" ["sh/resize.sh","data/jpeg"]
   return ()
 
--- * CSV
+-- * Csv
 
 -- > load_image_data prj_dir
 load_image_data :: FilePath -> IO [Image]
 load_image_data dir = do
   let csv_fn = dir </> "data/csv/images.csv"
-  str <- IO.read_file_utf8 csv_fn
+  str <- Io.read_file_utf8 csv_fn
   let p = C.parseDSV False ',' str
       r = C.fromCSVTable (C.csvTable p)
       f [s_ix,i_ix,z,fn,nm] = Image s_ix i_ix (read z) fn nm
