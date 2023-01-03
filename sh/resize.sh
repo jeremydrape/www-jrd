@@ -7,7 +7,7 @@ if test $# != 1 ; then echo "resize.sh image-directory" ; exit 1 ; fi
 d=$1
 verbose=false
 
-for s in 350 500 # 150 250 350 500
+for s in 350 500 800 # 150 250 350 500
 do
     o=h-$s
     mkdir -p $d/$o
