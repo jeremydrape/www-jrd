@@ -201,7 +201,7 @@ mk_md st mt =
               Just h -> H.div_c mt [H.cdata_raw h]
               _ -> H.div_c mt [H.cdata_raw ("mk-md: " ++ mt ++ "?: " ++ unwords (map fst (st_html st)))]
         hd = H.head [] (jrd_meta mt)
-        bd = H.body [H.class_attr mt] [H.div_c "main" [c]]
+        bd = H.body [H.class_attr mt] [H.div_c "main" [H.div_c "text" [c]]]
     in H.renderHtml5_pp (H.html_en [hd,bd])
 
 mk_img_div :: Int -> [String] -> (String,Maybe String) -> H.Content
