@@ -72,6 +72,8 @@ hr {
 /* class */
 
 div.main {
+	width: 100%;
+	text-align: center;
 }
 
 div.menu {
@@ -82,7 +84,7 @@ div.menu a {
 	text-decoration: none;
 }
 
-div.content, div.about {
+div.content {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -97,7 +99,7 @@ div.content, div.about {
 }
 
 div.about {
-	/*margin-left: 15%;*/
+	margin-left: 0 auto;
 }
 
 div.cycle-slideshow {
