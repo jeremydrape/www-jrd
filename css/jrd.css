@@ -74,6 +74,8 @@ div.menu a {
 }
 
 div.status {
+	font-family: "Helvetica", sans-serif;
+	font-color: grey;
 	display: inline;
 }
 
