@@ -18,8 +18,11 @@ import qualified Www.Minus.Io as Io {- www-minus -}
 prj_dir :: FilePath
 prj_dir = "/home/rohan/ut/www-jrd/"
 
-img_r_fn :: Int -> FilePath -> FilePath
-img_r_fn sz nm = "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
+img_r_fn :: Bool -> Int -> FilePath -> FilePath
+img_r_fn resize sz nm =
+  if resize
+  then "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
+  else "data/jpeg" </> nm <.> "jpeg"
 
 md_fn :: FilePath -> FilePath
 md_fn nm = "data/md" </> nm <.> "md"
@@ -68,6 +71,9 @@ st_opt_lookup = opt_lookup . st_opt
 
 st_opt_lookup_int :: State -> String -> Int -> Int
 st_opt_lookup_int = opt_lookup_read . st_opt
+
+st_opt_lookup_bool :: State -> String -> Bool -> Bool
+st_opt_lookup_bool = opt_lookup_read . st_opt
 
 st_img_select_by_ix :: State -> [Image]
 st_img_select_by_ix st =
@@ -163,7 +169,7 @@ mk_slideshow st is =
                  _ -> Just (H.mk_attr "data-cycle-hash" k)
       f img = H.img ([H.class_attr "next"
                      ,H.alt (img_file img)
-                     ,H.src (img_r_fn (st_opt_lookup_int st "main:image-size" 1000) (img_file img))
+                     ,H.src (img_r_fn (st_opt_lookup_bool st "image-resize" True) (st_opt_lookup_int st "main:image-size" 1000) (img_file img))
                      ,H.mk_attr "data-cycle-title" (img_title img)] ++ catMaybes [addr (img_file img)])
       pkg s = unlines (concat [slideshow_pre st,s,slideshow_post])
       gen = pkg . map (H.showHtml5 . f)
@@ -207,7 +213,7 @@ mk_md st mt =
 mk_img_div :: Int -> [String] -> (String,Maybe String) -> H.Content
 mk_img_div sz cl (i,t) =
     let ln = [H.href "."]
-        im = [H.img [H.src (img_r_fn sz i)]]
+        im = [H.img [H.src (img_r_fn True sz i)]]
         bd = case t of
                Nothing -> [H.a ln im]
                Just t' -> [H.a ln im,H.div_c "title" [H.cdata t']]
