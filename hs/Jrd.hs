@@ -124,10 +124,15 @@ slideshow_pre st =
     ,concatMap H.showHtml5 (jrd_meta "")
     ,"<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js\"></script>"
     ,"<script src=\"https://malsup.github.io/min/jquery.cycle2.min.js\"></script>"
+    ,"<script src=\"./js/jrd.js\"></script>"
+    ,"<script>"
+    ,"window.onload = function () { onAllImagesLoaded(() => setStatus('')); setupArrowKeys(); };"
+    ,"</script>"
     ,"</head>"
     ,"<body>"
     ,"<div class=\"main\">"
     ,H.showHtml5 (menu_html st)
+    ,"<div class=\"status\">Loading...</div>"
     ,"<div class=\"content\">"
     ,"<div class=\"cycle-slideshow\""
     ,"     data-cycle-fx=\"fadeout\""
@@ -149,14 +154,6 @@ slideshow_post =
     ,"</div> <!-- end content -->"
     --,"<div class=\"title\" id=\"caption\"></div>" -- SEE data/md/menu.md
     ,"</div> <!-- end main -->"
-    ,"<script>"
-    ,"addEventListener('keydown' , function(ev) {"
-    ,"  switch(ev.keyCode) {"
-    ,"    case 37: $('.cycle-slideshow').cycle('prev'); break;"
-    ,"    case 39: $('.cycle-slideshow').cycle('next'); break;"
-    ,"  }"
-    ,"});"
-    ,"</script>"
     ,"</body>"]
 
 -- > img <- load_image_group prj_dir
