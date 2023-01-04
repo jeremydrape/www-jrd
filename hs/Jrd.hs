@@ -126,7 +126,7 @@ slideshow_pre st =
     ,"<script src=\"https://malsup.github.io/min/jquery.cycle2.min.js\"></script>"
     ,"<script src=\"./js/jrd.js\"></script>"
     ,"<script>"
-    ,"window.onload = function () { onAllImagesLoaded(() => setStatus('')); setupArrowKeys(); };"
+    ,"window.onload = function () { onAllImagesLoaded(() => setStatus('')); };"
     ,"</script>"
     ,"</head>"
     ,"<body>"
@@ -154,6 +154,7 @@ slideshow_post =
     ,"</div> <!-- end content -->"
     --,"<div class=\"title\" id=\"caption\"></div>" -- SEE data/md/menu.md
     ,"</div> <!-- end main -->"
+    ,"<script>setupArrowKeys();</script>"
     ,"</body>"]
 
 -- > img <- load_image_group prj_dir
