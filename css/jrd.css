@@ -91,11 +91,11 @@ div.content {
 
 div.text {
 	width: 100%;
-	text-align: center;
+	text-align: left;
 }
 
 div.about {
-	margin-left: 0 auto;
+	margin-left: 2em;
 }
 
 div.cycle-slideshow {
