@@ -14,7 +14,7 @@ Olive Cotton Award\
 2025
 
 Mullins Conceptual Photography Prize\
-[Muswellbrook Regional Arts Centre] (https://artgallery.muswellbrook.nsw.gov.au/)\
+[Muswellbrook Regional Arts Centre](https://artgallery.muswellbrook.nsw.gov.au/)\
 2025
 
 IRIS Award\
