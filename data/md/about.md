@@ -9,6 +9,14 @@ contact@jeremydrape.com\
 Bachelor of Fine Arts (Honours)\
 Victorian College of the Arts
 
+Olive Cotton Award\
+[Tweed Regional Gallery](https://gallery.tweed.nsw.gov.au/Home)\
+2025
+
+Mullins Conceptual Photography Prize\
+[Muswellbrook Regional Arts Centre] (https://artgallery.muswellbrook.nsw.gov.au/)\
+2025
+
 IRIS Award\
 [Perth Centre for Contemporary Photography](https://www.pcp.org.au/)\
 2021
