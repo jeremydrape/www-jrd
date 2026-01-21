@@ -18,11 +18,14 @@ import qualified Www.Minus.Io as Io {- www-minus -}
 prj_dir :: FilePath
 prj_dir = "/home/rohan/ut/www-jrd/"
 
+img_gh_fn :: FilePath -> FilePath
+img_gh_fn nm = "https://raw.githubusercontent.com/jeremydrape/www-jrd/refs/heads/master/data/jpeg/" </> nm <.> ".jpeg"
+
 img_r_fn :: Bool -> Int -> FilePath -> FilePath
 img_r_fn resize sz nm =
   if resize
   then "data/jpeg/h-" ++ show sz </> nm <.> "jpeg"
-  else "data/jpeg" </> nm <.> "jpeg"
+  else img_gh_fn nm -- "data/jpeg" </> nm <.> "jpeg"
 
 md_fn :: FilePath -> FilePath
 md_fn nm = "data/md" </> nm <.> "md"
