@@ -19,18 +19,19 @@ clean:
 	(cd hs; make clean)
 	(cd data/jpeg; make clean)
 
-push-rd:
-	git push ssh://rd@rohandrape.net/~rd/ut/www-jrd.git master
+push-jrd-gh:
+	git push git@github.com:jeremydrape/www-jrd master
 
-pull-rd:
-	git pull ssh://rd@rohandrape.net/~rd/ut/www-jrd.git master
-
-pull-rd-http:
-	git pull http://rohandrape.net/ut/www-jrd.git/ master
+pull-jrd-gh:
+	git pull https://github.com/jeremydrape/www-jrd master
 
 pull-jrd:
 	ssh jeremydrape@jeremydrape.com "(cd jeremydrape.com; git push ../www-jrd.git master)"
 	git pull http://jeremydrape.com/www-jrd.git/ master
+
+push-all:
+	dir=ut r.gitlab-push.sh www-jrd
+	dir=ut r.github-push.sh www-jrd
 
 remote-update:
 	ssh rd@rohandrape.net "(cd ut/www-jrd; git pull ../www-jrd.git)"
